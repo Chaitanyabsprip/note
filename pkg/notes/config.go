@@ -1,6 +1,8 @@
 package notes
 
-import "errors"
+import (
+	"errors"
+)
 
 type Config struct {
 	Filepath      string
@@ -10,19 +12,9 @@ type Config struct {
 	OpenEditor    bool
 }
 
-func NewConfig(
-	filepath string,
-	level, numOfHeadings int,
-	help, openEditor bool,
-) (*Config, error) {
-	if level < 1 || level > 6 {
-		return nil, errors.New("")
+func (c *Config) Validate() error {
+	if c.Level > 6 || c.Level < 1 {
+		return errors.New("level can be between [1, 6]")
 	}
-	c := new(Config)
-	c.Filepath = filepath
-	c.OpenEditor = openEditor
-	c.Help = help
-	c.NumOfHeadings = numOfHeadings
-	c.Level = level
-	return c, nil
+	return nil
 }
