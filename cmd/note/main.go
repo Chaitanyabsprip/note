@@ -91,14 +91,15 @@ func validateContent(content string) {
 		os.Exit(0)
 	}
 }
+
 func setupFile(fpath, label string) {
 	dpath := filepath.Dir(fpath)
 	if _, err := os.Stat(dpath); os.IsNotExist(err) {
-		os.MkdirAll(dpath, 0755)
+		os.MkdirAll(dpath, 0o755)
 	}
 	if _, err := os.Stat(fpath); os.IsNotExist(err) {
 		heading := fmt.Sprintf("# %s\n", strings.ToTitle(label))
-		os.WriteFile(fpath, []byte(heading), 0644)
+		os.WriteFile(fpath, []byte(heading), 0o644)
 	}
 }
 
@@ -150,7 +151,7 @@ func checkErr(err error) {
 }
 
 func appendToFile(fpath, content string) {
-	f, err := os.OpenFile(fpath, os.O_APPEND|os.O_WRONLY, 0644)
+	f, err := os.OpenFile(fpath, os.O_APPEND|os.O_WRONLY, 0o644)
 	checkErr(err)
 	defer f.Close()
 
@@ -282,5 +283,4 @@ func main() {
 	default:
 		fmt.Fprintln(os.Stdout, "nothing to do")
 	}
-
 }
