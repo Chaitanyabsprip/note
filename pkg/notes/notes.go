@@ -3,7 +3,6 @@ package notes
 import (
 	"fmt"
 	"io"
-	"log"
 	"os"
 	"strings"
 
@@ -12,20 +11,29 @@ import (
 
 const BUFSIZE int64 = 256
 
-func ReadHeadings(filepath string, numOfHeadings int, level int) (string, error) {
-	file, err := os.Open(filepath)
+func App(w io.Writer, config Config) error {
+	file, err := os.Open(config.Filepath)
 	if err != nil {
-		return "", err
-	}
-	fi, err := file.Stat()
-	if err != nil {
-		return "", err
+		return err
 	}
 	defer file.Close()
+	content, err := ReadHeadings(file, config.NumOfHeadings, config.Level)
+	if err != nil {
+		return err
+	}
+	Preview(w, content)
+	return nil
+}
+
+func ReadHeadings(file *os.File, numOfHeadings int, level int) (string, error) {
+	fileInfo, err := file.Stat()
+	if err != nil {
+		return "", err
+	}
 
 	heading := strings.Repeat("#", level)
 	sep := fmt.Sprintf("\n%s ", heading)
-	filesize := fi.Size()
+	filesize := fileInfo.Size()
 	offset := BUFSIZE
 	count := 0
 	out := ""
@@ -36,7 +44,8 @@ func ReadHeadings(filepath string, numOfHeadings int, level int) (string, error)
 		if err != nil {
 			return "", err
 		}
-		bytesRead, err := file.Read(readBuffer)
+		var bytesRead int
+		bytesRead, err = file.Read(readBuffer)
 		if err != nil {
 			return "", err
 		}
@@ -76,15 +85,6 @@ func ReadHeadings(filepath string, numOfHeadings int, level int) (string, error)
 func splitAfterN(s, sep string, n int) string {
 	split := strings.SplitN(s, sep, n)
 	return split[len(split)-1]
-}
-
-func App(w io.Writer, config Config) {
-	content, err := ReadHeadings(config.Filepath, config.NumOfHeadings, config.Level)
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	// _ = content
-	Preview(w, content)
 }
 
 func Preview(w io.Writer, in string) error {

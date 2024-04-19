@@ -23,20 +23,17 @@ func main() {
 func run(ctx context.Context, args []string, w io.Writer, getenv func(string) string) (int, error) {
 	_, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
-
 	flags := flag.NewFlagSet(args[0], flag.ExitOnError)
 	config, err := parseArgs(flags, args[1:], getenv)
 	if err != nil {
 		return 1, err
 	}
-
 	if config.Help {
 		flags.Usage()
 		os.Exit(0)
 	}
-
-	notes.App(w, *config)
-	return 0, nil
+	err = notes.App(w, *config)
+	return 0, err
 }
 
 func parseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*notes.Config, error) {
