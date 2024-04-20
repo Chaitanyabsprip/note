@@ -68,7 +68,6 @@ func parseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (
 	flags.BoolFunc("t", "Set the note as a todo item", todoFlagFunc)
 
 	localFlagFunc := func(x string) error {
-		fmt.Printf("%T", x)
 		var np string
 		np, err = os.Getwd()
 		config.Notespath = np
