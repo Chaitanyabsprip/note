@@ -77,7 +77,7 @@ func parseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (
 	flags.BoolFunc("local", "Use a file local to current directory", localFlagFunc)
 	flags.BoolFunc("l", "Use a file local to current directory", localFlagFunc)
 	flags.Parse(args)
-	config.Content = strings.Join(flags.Args(), "")
+	config.Content = strings.Join(flags.Args(), " ")
 	err = config.Validate()
 	if err != nil {
 		return nil, err
