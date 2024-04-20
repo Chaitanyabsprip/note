@@ -1,14 +1,23 @@
-.DEFAULT_GOAL:=./bin/note
-INSTALL_PATH=/usr/local/bin/note
+.DEFAULT_GOAL:=build
+SOURCES := $(shell find . -type f -name '*.go')
 
-./bin/note: main.go
-	@go build -o ./bin/note
+build: cmd/note/main.go cmd/notes/main.go
+	@mkdir bin 2> /dev/null
+	@go build -o ./bin ./cmd/note ./cmd/notes
+
+note:
+	@mkdir bin 2> /dev/null
+	@go build -o ./bin ./cmd/note
+
+notes:
+	@mkdir bin 2> /dev/null
+	@go build -o ./bin ./cmd/notes
 
 clean:
 	@rm -rd ./bin
 
-install: ./bin/note
-	@install ./bin/pomo ${INSTALL_PATH}
+install:
+	@go install ./cmd/note ./cmd/notes
 
 uninstall: clean
-	@rm ${INSTALL_PATH}
+	@rm "$(which note)" "$(which notes)"
