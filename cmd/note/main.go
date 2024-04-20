@@ -28,10 +28,6 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 	if err != nil {
 		return 1, err
 	}
-	if config.Help {
-		flags.Usage()
-		os.Exit(0)
-	}
 	err = note.App(*config)
 	if err != nil {
 		return 1, err

@@ -49,9 +49,6 @@ func parseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (
 
 	flags.Usage = func() { fmt.Printf(usage, binName) }
 
-	flags.BoolVar(&config.Help, "help", false, "Show this help message")
-	flags.BoolVar(&config.Help, "h", false, "Show this help message")
-
 	flags.BoolVar(&config.Quiet, "quiet", false, "Be silent")
 	flags.BoolVar(&config.Quiet, "q", false, "Be silent")
 

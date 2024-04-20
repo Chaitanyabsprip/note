@@ -9,12 +9,11 @@ type Config struct {
 	Mode      string
 	Notespath string
 	EditFile  bool
-	Help      bool
 	Quiet     bool
 }
 
 func (c *Config) Validate() error {
-	if c.Content == "" && !c.EditFile && !c.Help {
+	if c.Content == "" && !c.EditFile {
 		return errors.New("nothing to note here")
 	}
 	return nil
