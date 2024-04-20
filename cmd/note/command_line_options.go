@@ -85,9 +85,10 @@ func parseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (
 }
 
 func defaultNotespath(getenv func(string) string) (notespath string, err error) {
-	notespath = getenv("NOTESPATH")
-	if notespath == "" {
-		notespath, err = os.Getwd()
-	}
+	_ = getenv
+	// notespath = getenv("NOTESPATH")
+	// if notespath == "" {
+	notespath, err = os.Getwd()
+	// }
 	return
 }
