@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-	"unicode"
 
 	"github.com/chaitanyabsprip/note/pkg/notes"
 )
@@ -198,16 +197,16 @@ func wordWrap(text string, lineWidth int) string {
 
 func sentenceCase(input string) string {
 	var sb strings.Builder
-	sentences := strings.FieldsFunc(input, func(r rune) bool {
-		return unicode.IsPunct(r) && r != '.'
-	})
+	sentences := strings.Split(input, ". ")
 	for _, sentence := range sentences {
 		sentence = strings.TrimSpace(sentence)
-		if len(sentence) > 0 {
-			sentence = strings.ToLower(sentence)
-			sentence = strings.ToUpper(string(sentence[0])) + sentence[1:]
+		if len(sentence) == 0 {
+			continue
 		}
-		sb.WriteString(sentence + " ")
+		sentence = strings.ToLower(sentence)
+		sb.WriteString(strings.ToUpper(string(sentence[0])))
+		sb.WriteString(sentence[1:])
+		sb.WriteString(". ")
 	}
 	return strings.TrimSpace(sb.String())
 }
