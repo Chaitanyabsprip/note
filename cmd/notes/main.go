@@ -28,10 +28,6 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 	if err != nil {
 		return 1, err
 	}
-	if config.Help {
-		flags.Usage()
-		os.Exit(0)
-	}
 	err = notes.App(w, *config)
 	return 0, err
 }
@@ -39,8 +35,6 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 func parseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*notes.Config, error) {
 	notesfile := getDefaultNotesFile(getenv)
 	config := new(notes.Config)
-	flags.BoolVar(&config.Help, "h", false, "Show this help message")
-	flags.BoolVar(&config.Help, "help", false, "Show this help message")
 	flags.BoolVar(&config.OpenEditor, "e", false, "Open notes file in $EDITOR")
 	flags.BoolVar(&config.OpenEditor, "edit", false, "Open notes file in $EDITOR")
 	flags.IntVar(&config.NumOfHeadings, "n", 3, "Number of trailing headings to dump")

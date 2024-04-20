@@ -8,7 +8,6 @@ type Config struct {
 	Filepath      string
 	Level         int
 	NumOfHeadings int
-	Help          bool
 	OpenEditor    bool
 }
 
