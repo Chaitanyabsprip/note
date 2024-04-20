@@ -35,8 +35,6 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 func parseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*notes.Config, error) {
 	notesfile := getDefaultNotesFile(getenv)
 	config := new(notes.Config)
-	flags.BoolVar(&config.OpenEditor, "e", false, "Open notes file in $EDITOR")
-	flags.BoolVar(&config.OpenEditor, "edit", false, "Open notes file in $EDITOR")
 	flags.IntVar(&config.NumOfHeadings, "n", 3, "Number of trailing headings to dump")
 	flags.IntVar(&config.Level, "l", 2, "Level of heading to match (default: 2, i.e. ##)")
 	flags.IntVar(&config.Level, "level", 2, "Level of heading to match (default: 2, i.e. ##)")

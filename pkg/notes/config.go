@@ -8,7 +8,6 @@ type Config struct {
 	Filepath      string
 	Level         int
 	NumOfHeadings int
-	OpenEditor    bool
 }
 
 func (c *Config) Validate() error {
