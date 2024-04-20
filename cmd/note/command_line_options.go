@@ -21,7 +21,7 @@ Options:
     -t, --todo           Create a new todo item
     -e, --edit           Edit the notes file in the default editor
     -l, --local          Use a file local to current directory
-    -q,                  Be silent
+    -q, --quiet          Be silent
     -h, --help           Show this help message
 
 Examples:
