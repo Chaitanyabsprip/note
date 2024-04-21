@@ -1,4 +1,4 @@
-package notes
+package note
 
 import (
 	"fmt"
@@ -11,8 +11,8 @@ import (
 
 const BUFSIZE int64 = 256
 
-func App(w io.Writer, config Config) error {
-	file, err := os.Open(config.Filepath)
+func Peek(w io.Writer, config Config) error {
+	file, err := os.Open(config.Notespath)
 	if err != nil {
 		return err
 	}

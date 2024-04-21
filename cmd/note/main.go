@@ -24,11 +24,16 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 	defer cancel()
 	_ = w
 	flags := flag.NewFlagSet(args[0], flag.ExitOnError)
-	config, err := parseArgs(flags, args[1:], getenv)
+	config, err := ParseArgs(flags, args[1:], getenv)
 	if err != nil {
 		return 1, err
 	}
-	err = note.App(*config)
+	if args[1] == "peek" {
+		fmt.Println(config.Notespath)
+		err = note.Peek(w, *config)
+	} else {
+		err = note.App(*config)
+	}
 	if err != nil {
 		return 1, err
 	}

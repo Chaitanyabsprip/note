@@ -30,7 +30,45 @@ Examples:
     %[1]s -t This is a new todo item
 `
 
-func parseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*note.Config, error) {
+func ParseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*note.Config, error) {
+	var config *note.Config
+	var err error
+	if args[0] == "peek" {
+		config, err = parsePreviewArgs(flags, args[1:], getenv)
+	} else {
+		config, err = parseNoteArgs(flags, args, getenv)
+	}
+	return config, err
+}
+
+func parsePreviewArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*note.Config, error) {
+	config := new(note.Config)
+	config.Mode = "dump"
+	notespath := getenv("NOTESPATH")
+	bookmarkFlagFunc := setMode(config, "bookmark")
+	dumpFlagFunc := setMode(config, "dump")
+	todoFlagFunc := setMode(config, "todo")
+	flags.IntVar(&config.NumOfHeadings, "n", 3, "Number of trailing headings to dump")
+	flags.IntVar(&config.Level, "l", 2, "Level of heading to match (default: 2, i.e. ##)")
+	flags.IntVar(&config.Level, "level", 2, "Level of heading to match (default: 2, i.e. ##)")
+	flags.StringVar(&config.Notespath, "f", notespath, "Path to the markdown file to dump headings from")
+	flags.StringVar(&config.Notespath, "file", notespath, "Path to the markdown file to dump headings from")
+	flags.BoolFunc("bookmark", "Add the note to the bookmark list", bookmarkFlagFunc)
+	flags.BoolFunc("b", "Add the note to the bookmark list", bookmarkFlagFunc)
+	flags.BoolFunc("dump", "Write the note to the notes file", dumpFlagFunc)
+	flags.BoolFunc("d", "Dump the notes to a file", dumpFlagFunc)
+	flags.BoolFunc("todo", "Set the note as a todo item", todoFlagFunc)
+	flags.BoolFunc("t", "Set the note as a todo item", todoFlagFunc)
+	flags.Parse(args)
+	config.Notespath = config.FilePath()
+	err := config.Validate()
+	if err != nil {
+		return nil, err
+	}
+	return config, nil
+}
+
+func parseNoteArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*note.Config, error) {
 	config := new(note.Config)
 	config.Mode = "dump"
 	binName := filepath.Base(os.Args[0])
@@ -39,31 +77,21 @@ func parseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (
 		return nil, err
 	}
 	config.Notespath = notespath
-
-	setMode := func(mode string) func(string) error {
-		return func(_ string) error {
-			config.Mode = mode
-			return nil
-		}
-	}
+	dumpFlagFunc := setMode(config, "dump")
+	bookmarkFlagFunc := setMode(config, "bookmark")
+	todoFlagFunc := setMode(config, "todo")
 
 	flags.Usage = func() { fmt.Printf(usage, binName) }
-
 	flags.BoolVar(&config.Quiet, "quiet", false, "Be silent")
 	flags.BoolVar(&config.Quiet, "q", false, "Be silent")
-
 	flags.BoolVar(&config.EditFile, "edit", false, "Edit the notes file in the default editor")
 	flags.BoolVar(&config.EditFile, "e", false, "Edit the notes file in the default editor")
-
-	bookmarkFlagFunc := setMode("bookmark")
+	flags.StringVar(&config.Notespath, "f", notespath, "Path to the markdown file to dump headings from")
+	flags.StringVar(&config.Notespath, "file", notespath, "Path to the markdown file to dump headings from")
 	flags.BoolFunc("bookmark", "Add the note to the bookmark list", bookmarkFlagFunc)
 	flags.BoolFunc("b", "Add the note to the bookmark list", bookmarkFlagFunc)
-
-	dumpFlagFunc := setMode("dump")
 	flags.BoolFunc("dump", "Write the note to the notes file", dumpFlagFunc)
 	flags.BoolFunc("d", "Dump the notes to a file", dumpFlagFunc)
-
-	todoFlagFunc := setMode("todo")
 	flags.BoolFunc("todo", "Set the note as a todo item", todoFlagFunc)
 	flags.BoolFunc("t", "Set the note as a todo item", todoFlagFunc)
 
@@ -77,11 +105,19 @@ func parseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (
 	flags.BoolFunc("l", "Use a file local to current directory", localFlagFunc)
 	flags.Parse(args)
 	config.Content = strings.Join(flags.Args(), " ")
+	config.Notespath = config.FilePath()
 	err = config.Validate()
 	if err != nil {
 		return nil, err
 	}
 	return config, nil
+}
+
+func setMode(config *note.Config, mode string) func(string) error {
+	return func(_ string) error {
+		config.Mode = mode
+		return nil
+	}
 }
 
 func defaultNotespath(getenv func(string) string) (notespath string, err error) {

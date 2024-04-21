@@ -7,8 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
-
-	"github.com/chaitanyabsprip/note/pkg/notes"
 )
 
 func App(config Config) (err error) {
@@ -162,7 +160,7 @@ func maybeOpenEditor(config Config, fpath, editorCommand string) {
 }
 
 func lastHeading(file *os.File) (string, error) {
-	content, err := notes.ReadHeadings(file, 1, 2)
+	content, err := ReadHeadings(file, 1, 2)
 	if err != nil {
 		return "", err
 	}
@@ -212,10 +210,10 @@ func sentenceCase(input string) string {
 }
 
 func preview(file *os.File) error {
-	content, err := notes.ReadHeadings(file, 1, 2)
+	content, err := ReadHeadings(file, 1, 2)
 	if err != nil {
 		return err
 	}
-	notes.Preview(os.Stdout, content)
+	Preview(os.Stdout, content)
 	return nil
 }
