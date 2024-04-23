@@ -13,7 +13,7 @@ const BUFSIZE int64 = 256
 
 type Preview struct {
 	out           io.Writer
-	Mode          string
+	Type          string
 	NotesPath     string
 	NumOfHeadings int
 	Level         int
@@ -21,13 +21,13 @@ type Preview struct {
 
 func New(
 	w io.Writer,
-	mode string,
+	_type string,
 	notesPath string,
 	numOfHeadings int,
 	level int,
 ) *Preview {
 	p := new(Preview)
-	p.Mode = mode
+	p.Type = _type
 	p.NotesPath = notesPath
 	p.NumOfHeadings = numOfHeadings
 	p.Level = level
