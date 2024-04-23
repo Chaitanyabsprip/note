@@ -1,4 +1,4 @@
-package note
+package preview
 
 import (
 	"fmt"
@@ -11,17 +11,41 @@ import (
 
 const BUFSIZE int64 = 256
 
-func Peek(w io.Writer, config Config) error {
-	file, err := os.Open(config.Notespath)
+type Preview struct {
+	out           io.Writer
+	Mode          string
+	NotesPath     string
+	NumOfHeadings int
+	Level         int
+}
+
+func New(
+	w io.Writer,
+	mode string,
+	notesPath string,
+	numOfHeadings int,
+	level int,
+) *Preview {
+	p := new(Preview)
+	p.Mode = mode
+	p.NotesPath = notesPath
+	p.NumOfHeadings = numOfHeadings
+	p.Level = level
+	p.out = w
+	return p
+}
+
+func (p *Preview) Peek() error {
+	file, err := os.Open(p.NotesPath)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-	content, err := ReadHeadings(file, config.NumOfHeadings, config.Level)
+	content, err := ReadHeadings(file, p.NumOfHeadings, p.Level)
 	if err != nil {
 		return err
 	}
-	Preview(w, content)
+	Render(p.out, content)
 	return nil
 }
 
@@ -87,7 +111,7 @@ func splitAfterN(s, sep string, n int) string {
 	return split[len(split)-1]
 }
 
-func Preview(w io.Writer, in string) error {
+func Render(w io.Writer, in string) error {
 	out, err := glamour.Render(in, "dark")
 	fmt.Fprintln(w, out)
 	if err != nil {
