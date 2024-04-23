@@ -54,10 +54,9 @@ func (n Note) Note() error {
 		fmt.Fprintln(os.Stdout, "nothing to do")
 		return nil
 	}
-	filepath := noteType.filepath(n.NotesPath)
-	setupFile(filepath, noteType.label())
-	maybeOpenEditor(n.EditFile, filepath, "nvim")
-	file, err := os.OpenFile(filepath, os.O_APPEND|os.O_RDWR, 0o644)
+	setupFile(n.NotesPath, noteType.label())
+	maybeOpenEditor(n.EditFile, n.NotesPath, "nvim")
+	file, err := os.OpenFile(n.NotesPath, os.O_APPEND|os.O_RDWR, 0o644)
 	if err != nil {
 		return err
 	}
@@ -76,16 +75,11 @@ func (n Note) Note() error {
 }
 
 type noteType interface {
-	filepath(string) string
 	label() string
 	note(string, *os.File) (string, error)
 }
 
 type bookmark struct{}
-
-func (bookmark) filepath(notesPath string) string {
-	return fmt.Sprintf("%s/notes.bookmarks.md", notesPath)
-}
 
 func (bookmark) label() string {
 	return "Bookmarks"
@@ -105,10 +99,6 @@ func (bookmark) note(content string, file *os.File) (string, error) {
 
 type notes struct{}
 
-func (notes) filepath(notesPath string) string {
-	return fmt.Sprintf("%s/notes.dump.md", notesPath)
-}
-
 func (notes) label() string {
 	return "Notes"
 }
@@ -127,10 +117,6 @@ func (notes) note(content string, file *os.File) (string, error) {
 }
 
 type todo struct{}
-
-func (todo) filepath(notesPath string) string {
-	return fmt.Sprintf("%s/notes.todo.md", notesPath)
-}
 
 func (todo) label() string {
 	return "Todo"
