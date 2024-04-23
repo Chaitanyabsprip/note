@@ -1,150 +1,171 @@
 package note
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
+	path "path/filepath"
 	"strings"
 	"time"
+
+	"github.com/chaitanyabsprip/note/pkg/preview"
 )
 
-func App(config Config) (err error) {
-	switch config.Mode {
+type Note struct {
+	Content     string
+	Type        string
+	NotesPath   string
+	EditFile    bool
+	ShowPreview bool
+}
+
+func New(content, _type, notesPath string, editFile, showPreview bool) (Note, error) {
+	n := new(Note)
+	n.Content = content
+	n.Type = _type
+	n.NotesPath = notesPath
+	n.EditFile = editFile
+	n.ShowPreview = showPreview
+	err := n.validate()
+	if err != nil {
+		return Note{}, err
+	}
+	return *n, nil
+}
+
+func (n Note) validate() error {
+	if n.Content == "" && !n.EditFile {
+		return errors.New("nothing to note here")
+	}
+	return nil
+}
+
+func (n Note) Note() error {
+	var noteType noteType
+	switch n.Type {
 	case "bookmark":
-		err = bookmark(config)
+		noteType = bookmark{}
 	case "dump":
-		err = dump(config)
+		noteType = notes{}
 	case "todo":
-		err = todo(config)
+		noteType = todo{}
 	default:
 		fmt.Fprintln(os.Stdout, "nothing to do")
-	}
-	return err
-}
-
-func isFileClosed(file *os.File) bool {
-	_, err := file.Stat()
-	return err != nil
-}
-
-func bookmark(config Config) error {
-	fpath := fmt.Sprintf("%s/notes.bookmarks.md", config.Notespath)
-	setupFile(fpath, "Bookmarks")
-	maybeOpenEditor(config, fpath, "nvim")
-	file, err := os.OpenFile(fpath, os.O_APPEND|os.O_RDWR, 0o644)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	lHeading, err := lastHeading(file)
-	if err != nil {
 		return nil
 	}
-
-	firstEntry := lHeading == ""
-	prevTime := strings.TrimPrefix(lHeading, "## ")
-	currTime := time.Now().Format("Mon, 02 Jan 2006")
-
-	note := config.Content
-	if currTime != prevTime || firstEntry {
-		note = fmt.Sprintf("\n## %s\n\n%s", currTime, config.Content)
+	filepath := noteType.filepath(n.NotesPath)
+	setupFile(filepath, noteType.label())
+	maybeOpenEditor(n.EditFile, filepath, "nvim")
+	file, err := os.OpenFile(filepath, os.O_APPEND|os.O_RDWR, 0o644)
+	if err != nil {
+		return err
 	}
-	note = fmt.Sprintln(note)
-
+	note, err := noteType.note(n.Content, file)
+	if err != nil {
+		return err
+	}
 	_, err = file.WriteString(note)
 	if err != nil {
 		return err
 	}
-	if !config.Quiet {
-		preview(file)
+	if !n.ShowPreview {
+		render(file)
 	}
 	return nil
 }
 
-func dump(config Config) error {
-	fpath := fmt.Sprintf("%s/notes.dump.md", config.Notespath)
-	setupFile(fpath, "Notes")
-	maybeOpenEditor(config, fpath, "nvim")
-	file, err := os.OpenFile(fpath, os.O_APPEND|os.O_RDWR, 0o644)
+type noteType interface {
+	filepath(string) string
+	label() string
+	note(string, *os.File) (string, error)
+}
+
+type bookmark struct{}
+
+func (bookmark) filepath(notesPath string) string {
+	return fmt.Sprintf("%s/notes.bookmarks.md", notesPath)
+}
+
+func (bookmark) label() string {
+	return "Bookmarks"
+}
+
+func (bookmark) note(content string, file *os.File) (string, error) {
+	heading, err := newHeading(file)
 	if err != nil {
-		return err
+		return "", err
 	}
-	defer file.Close()
-	lHeading, err := lastHeading(file)
+	note := content
+	if heading != "" {
+		note = fmt.Sprintf("\n%s\n\n%s", heading, content)
+	}
+	return fmt.Sprintln(note), nil
+}
+
+type notes struct{}
+
+func (notes) filepath(notesPath string) string {
+	return fmt.Sprintf("%s/notes.dump.md", notesPath)
+}
+
+func (notes) label() string {
+	return "Notes"
+}
+
+func (notes) note(content string, file *os.File) (string, error) {
+	heading, err := newHeading(file)
 	if err != nil {
-		return err
+		return "", err
 	}
-	isFirstEntry := lHeading == ""
-	prevTime := strings.TrimPrefix(lHeading, "## ")
-	currTime := time.Now().Format("Mon, 02 Jan 2006")
-	note := wordWrap(sentenceCase(config.Content), 80)
-	if currTime != prevTime || isFirstEntry {
-		note = fmt.Sprintf("\n## %s\n\n%s", currTime, note)
+	note := wordWrap(sentenceCase(content), 80)
+	if heading != "" {
+		note = fmt.Sprintf("\n%s\n\n%s", heading, note)
 	}
 	note = fmt.Sprintln(note)
-	br, err := file.WriteString(note)
-	if br < len(note) || err != nil {
-		return err
-	}
-	if !config.Quiet {
-		preview(file)
-	}
-	return nil
+	return note, nil
 }
 
-func todo(config Config) error {
-	fpath := fmt.Sprintf("%s/notes.todo.md", config.Notespath)
-	setupFile(fpath, "To-do")
-	maybeOpenEditor(config, fpath, "nvim")
-	file, err := os.OpenFile(fpath, os.O_APPEND|os.O_RDWR, 0o644)
+type todo struct{}
+
+func (todo) filepath(notesPath string) string {
+	return fmt.Sprintf("%s/notes.todo.md", notesPath)
+}
+
+func (todo) label() string {
+	return "Todo"
+}
+
+func (todo) note(content string, file *os.File) (string, error) {
+	heading, err := newHeading(file)
 	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	lHeading, err := lastHeading(file)
-	if err != nil {
-		return err
+		return "", err
 	}
 
-	firstEntry := lHeading == ""
-	prevTime := strings.TrimPrefix(lHeading, "## ")
-	currTime := time.Now().Format("Mon, 02 Jan 2006")
-
-	note := wordWrap(fmt.Sprint("- [ ] ", sentenceCase(config.Content)), 80)
-	if currTime != prevTime || firstEntry {
-		note = fmt.Sprintf("\n## %s\n\n%s", currTime, note)
+	note := wordWrap(fmt.Sprint("- [ ] ", sentenceCase(content)), 80)
+	if heading != "" {
+		note = fmt.Sprintf("\n%s\n\n%s", heading, note)
 	}
 	note = fmt.Sprintln(note)
-
-	_, err = file.WriteString(note)
-	if err != nil {
-		return err
-	}
-	if !config.Quiet {
-		preview(file)
-	}
-	return nil
+	return note, nil
 }
 
-func setupFile(fpath, label string) {
-	dpath := filepath.Dir(fpath)
+func setupFile(filepath, label string) {
+	dpath := path.Dir(filepath)
 	if _, err := os.Stat(dpath); os.IsNotExist(err) {
 		os.MkdirAll(dpath, 0o755)
 	}
-	if _, err := os.Stat(fpath); os.IsNotExist(err) {
+	if _, err := os.Stat(filepath); os.IsNotExist(err) {
 		heading := fmt.Sprintf("# %s\n", sentenceCase(label))
-		os.WriteFile(fpath, []byte(heading), 0o644)
+		os.WriteFile(filepath, []byte(heading), 0o644)
 	}
 }
 
-func maybeOpenEditor(config Config, fpath, editorCommand string) {
-	if !config.EditFile {
+func maybeOpenEditor(editFile bool, filepath, editorCommand string) {
+	if !editFile {
 		return
 	}
-	cmd := exec.Command(editorCommand, fpath)
+	cmd := exec.Command(editorCommand, filepath)
 	cmd.Stdin = os.Stdin
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -159,13 +180,20 @@ func maybeOpenEditor(config Config, fpath, editorCommand string) {
 	os.Exit(0)
 }
 
-func lastHeading(file *os.File) (string, error) {
-	content, err := ReadHeadings(file, 1, 2)
+func newHeading(file *os.File) (string, error) {
+	content, err := preview.ReadHeadings(file, 1, 2)
 	if err != nil {
 		return "", err
 	}
 	lines := strings.Split(content, "")
-	return lines[len(lines)-1], nil
+	lHeading := lines[len(lines)-1]
+	firstEntry := lHeading == ""
+	prevTime := strings.TrimPrefix(lHeading, "## ")
+	currTime := time.Now().Format("Mon, 02 Jan 2006")
+	if currTime != prevTime || firstEntry {
+		return fmt.Sprint("## ", currTime), nil
+	}
+	return "", nil
 }
 
 func wordWrap(text string, lineWidth int) string {
@@ -209,11 +237,21 @@ func sentenceCase(input string) string {
 	return strings.TrimSpace(sb.String())
 }
 
-func preview(file *os.File) error {
-	content, err := ReadHeadings(file, 1, 2)
+func render(file *os.File) error {
+	content, err := preview.ReadHeadings(file, 1, 2)
 	if err != nil {
 		return err
 	}
-	Preview(os.Stdout, content)
+	preview.Render(os.Stdout, content)
 	return nil
+}
+
+func getGitRoot() string {
+	cmd := "git"
+	args := []string{"rev-parse", "--show-toplevel"}
+	output, err := exec.Command(cmd, args...).Output()
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(output))
 }
