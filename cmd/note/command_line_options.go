@@ -6,8 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/chaitanyabsprip/note/pkg/note"
 )
 
 const usage = `
@@ -15,7 +13,6 @@ Usage:
     %[1]s [options]
 
 Options:
-    -D, --daily          Create a daily note
     -b, --bookmark       Create a new bookmark
     -d, --dump           Create a new note in the dump file(default)
     -t, --todo           Create a new todo item
@@ -30,8 +27,8 @@ Examples:
     %[1]s -t This is a new todo item
 `
 
-func ParseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*note.Config, error) {
-	var config *note.Config
+func ParseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*Config, error) {
+	var config *Config
 	var err error
 	if args[0] == "peek" {
 		config, err = parsePreviewArgs(flags, args[1:], getenv)
@@ -41,8 +38,8 @@ func ParseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (
 	return config, err
 }
 
-func parsePreviewArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*note.Config, error) {
-	config := new(note.Config)
+func parsePreviewArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*Config, error) {
+	config := new(Config)
 	config.Mode = "dump"
 	notespath := getenv("NOTESPATH")
 	bookmarkFlagFunc := setMode(config, "bookmark")
@@ -68,8 +65,8 @@ func parsePreviewArgs(flags *flag.FlagSet, args []string, getenv func(string) st
 	return config, nil
 }
 
-func parseNoteArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*note.Config, error) {
-	config := new(note.Config)
+func parseNoteArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*Config, error) {
+	config := new(Config)
 	config.Mode = "dump"
 	binName := filepath.Base(os.Args[0])
 	notespath, err := defaultNotespath(getenv)
@@ -113,7 +110,7 @@ func parseNoteArgs(flags *flag.FlagSet, args []string, getenv func(string) strin
 	return config, nil
 }
 
-func setMode(config *note.Config, mode string) func(string) error {
+func setMode(config *Config, mode string) func(string) error {
 	return func(_ string) error {
 		config.Mode = mode
 		return nil
