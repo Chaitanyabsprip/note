@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -23,11 +22,12 @@ func main() {
 func run(ctx context.Context, args []string, w io.Writer, getenv func(string) string) (int, error) {
 	_, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
-	flags := flag.NewFlagSet(args[0], flag.ExitOnError)
-	config, err := ParseArgs(flags, args[1:], getenv)
+	// parse configuration
+	config, err := ParseArgs(args[1:], getenv)
 	if err != nil {
 		return 1, err
 	}
+	// call application
 	if args[1] == "peek" {
 		p := preview.New(w, config.Mode, config.Notespath, config.NumOfHeadings, config.Level)
 		err = p.Peek()

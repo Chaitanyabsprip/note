@@ -6,122 +6,119 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+
+	"rsc.io/getopt"
 )
 
-const usage = `
-Usage:
-    %[1]s [options]
-
-Options:
-    -b, --bookmark       Create a new bookmark
-    -d, --dump           Create a new note in the dump file(default)
-    -t, --todo           Create a new todo item
-    -e, --edit           Edit the notes file in the default editor
-    -l, --local          Use a file local to current directory
-    -q, --quiet          Be silent
-    -h, --help           Show this help message
-
-Examples:
-    %[1]s This is a note
-    %[1]s -b 'https://newbookmark.com'
-    %[1]s -t This is a new todo item
-`
-
-func ParseArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*Config, error) {
+func ParseArgs(args []string, getenv func(string) string) (*Config, error) {
 	var config *Config
 	var err error
-	if args[0] == "peek" {
-		config, err = parsePreviewArgs(flags, args[1:], getenv)
-	} else {
-		config, err = parseNoteArgs(flags, args, getenv)
+	root := getopt.NewFlagSet("note", flag.ContinueOnError)
+	config, err = parseRootArgs(root, args, getenv)
+	pArgs := root.Args()
+	if root.NArg() > 0 && pArgs[0] == "peek" {
+		// if peek is the first word of the note then that will cause issues
+		previewCmd := getopt.NewFlagSet("note peek", flag.ContinueOnError)
+		config, err = parsePreviewArgs(previewCmd, root.Args()[1:], getenv)
+		return config, err
 	}
 	return config, err
 }
 
-func parsePreviewArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*Config, error) {
+func parseRootArgs(flags *getopt.FlagSet, args []string, getenv func(string) string) (*Config, error) {
 	config := new(Config)
 	config.Mode = "dump"
-	notespath := getenv("NOTESPATH")
-	bookmarkFlagFunc := setMode(config, "bookmark")
-	dumpFlagFunc := setMode(config, "dump")
-	todoFlagFunc := setMode(config, "todo")
-	flags.IntVar(&config.NumOfHeadings, "n", 3, "Number of trailing headings to dump")
-	flags.IntVar(&config.Level, "l", 2, "Level of heading to match (default: 2, i.e. ##)")
-	flags.IntVar(&config.Level, "level", 2, "Level of heading to match (default: 2, i.e. ##)")
-	flags.StringVar(&config.Notespath, "f", notespath, "Path to the markdown file to dump headings from")
-	flags.StringVar(&config.Notespath, "file", notespath, "Path to the markdown file to dump headings from")
-	flags.BoolFunc("bookmark", "Add the note to the bookmark list", bookmarkFlagFunc)
-	flags.BoolFunc("b", "Add the note to the bookmark list", bookmarkFlagFunc)
-	flags.BoolFunc("dump", "Write the note to the notes file", dumpFlagFunc)
-	flags.BoolFunc("d", "Dump the notes to a file", dumpFlagFunc)
-	flags.BoolFunc("todo", "Set the note as a todo item", todoFlagFunc)
-	flags.BoolFunc("t", "Set the note as a todo item", todoFlagFunc)
-	flags.Parse(args)
-	config.Notespath = config.FilePath()
-	err := config.Validate()
-	if err != nil {
-		return nil, err
-	}
-	return config, nil
-}
-
-func parseNoteArgs(flags *flag.FlagSet, args []string, getenv func(string) string) (*Config, error) {
-	config := new(Config)
-	config.Mode = "dump"
-	binName := filepath.Base(os.Args[0])
-	notespath, err := defaultNotespath(getenv)
-	if err != nil {
-		return nil, err
-	}
-	config.Notespath = notespath
-	dumpFlagFunc := setMode(config, "dump")
-	bookmarkFlagFunc := setMode(config, "bookmark")
-	todoFlagFunc := setMode(config, "todo")
-
-	flags.Usage = func() { fmt.Printf(usage, binName) }
-	flags.BoolVar(&config.Quiet, "quiet", false, "Be silent")
-	flags.BoolVar(&config.Quiet, "q", false, "Be silent")
-	flags.BoolVar(&config.EditFile, "edit", false, "Edit the notes file in the default editor")
-	flags.BoolVar(&config.EditFile, "e", false, "Edit the notes file in the default editor")
-	flags.StringVar(&config.Notespath, "f", notespath, "Path to the markdown file to dump headings from")
-	flags.StringVar(&config.Notespath, "file", notespath, "Path to the markdown file to dump headings from")
-	flags.BoolFunc("bookmark", "Add the note to the bookmark list", bookmarkFlagFunc)
-	flags.BoolFunc("b", "Add the note to the bookmark list", bookmarkFlagFunc)
-	flags.BoolFunc("dump", "Write the note to the notes file", dumpFlagFunc)
-	flags.BoolFunc("d", "Dump the notes to a file", dumpFlagFunc)
-	flags.BoolFunc("todo", "Set the note as a todo item", todoFlagFunc)
-	flags.BoolFunc("t", "Set the note as a todo item", todoFlagFunc)
-
-	localFlagFunc := func(x string) error {
-		var np string
-		np, err = os.Getwd()
-		config.Notespath = np
-		return err
-	}
-	flags.BoolFunc("local", "Use a file local to current directory", localFlagFunc)
-	flags.BoolFunc("l", "Use a file local to current directory", localFlagFunc)
-	flags.Parse(args)
-	config.Content = strings.Join(flags.Args(), " ")
-	config.Notespath = config.FilePath()
-	err = config.Validate()
-	if err != nil {
-		return nil, err
-	}
-	return config, nil
-}
-
-func setMode(config *Config, mode string) func(string) error {
-	return func(_ string) error {
-		config.Mode = mode
+	flags.BoolFunc("help", "Show this help message", func(s string) error {
+		if s == "true" {
+			flags.Usage()
+			os.Exit(0)
+		}
 		return nil
+	})
+	flags.Alias("h", "help")
+	bookmark := flags.Bool("bookmark", false, "Add new bookmark")
+	flags.Alias("b", "bookmark")
+	dump := flags.Bool("dump", false, "Add new dump")
+	flags.Alias("d", "dump")
+	todo := flags.Bool("todo", false, "Add new todo")
+	flags.Alias("t", "todo")
+	flags.BoolVar(&config.Global, "g", false, "Use global notes")
+	flags.BoolVar(&config.Quiet, "quiet", false, "Minimise output")
+	flags.Alias("q", "quiet")
+	flags.BoolVar(&config.EditFile, "edit", false, "Open file with $EDITOR")
+	flags.Alias("e", "edit")
+	defaultFilename := fmt.Sprint("notes.", config.Mode, ".md")
+	defaultFilepath, err := getDefaultFilepath(defaultFilename)
+	if err != nil {
+		return nil, err
 	}
+	flags.StringVar(&config.Notespath, "file", defaultFilepath, "Specify notes file")
+	flags.Alias("f", "file")
+	err = flags.Parse(args)
+	if err != nil {
+		return nil, err
+	}
+	config.Mode = getNoteType(*bookmark, *dump, *todo)
+	if config.Global {
+		config.Notespath = filepath.Join(getenv("NOTESPATH"), defaultFilename)
+	}
+	config.Content = strings.Join(flags.Args(), " ")
+	return config, nil
 }
 
-func defaultNotespath(getenv func(string) string) (notespath string, err error) {
-	_ = getenv
-	// notespath = getenv("NOTESPATH")
-	// if notespath == "" {
-	notespath, err = os.Getwd()
-	// }
-	return
+func parsePreviewArgs(flags *getopt.FlagSet, args []string, getenv func(string) string) (*Config, error) {
+	config := new(Config)
+	config.Mode = "dump"
+	flags.BoolFunc("help", "Show this help message", func(s string) error {
+		if s == "true" {
+			flags.Usage()
+			os.Exit(0)
+		}
+		return nil
+	})
+	flags.Alias("h", "help")
+	bookmark := flags.Bool("bookmark", false, "Add new bookmark")
+	flags.Alias("b", "bookmark")
+	dump := flags.Bool("dump", true, "Add new dump")
+	flags.Alias("d", "dump")
+	todo := flags.Bool("todo", false, "Add new todo")
+	flags.Alias("t", "todo")
+	defaultFilename := fmt.Sprint("notes.", config.Mode, ".md")
+	flags.IntVar(&config.Level, "level", 2, "Level of markdown heading")
+	flags.Alias("l", "level")
+	flags.IntVar(&config.NumOfHeadings, "n", 2, "Number of headings to preview")
+	defaultFilepath, err := getDefaultFilepath(defaultFilename)
+	if err != nil {
+		return nil, err
+	}
+	flags.StringVar(&config.Notespath, "file", defaultFilepath, "Specify notes file")
+	flags.Alias("f", "file")
+	err = flags.Parse(args)
+	if err != nil {
+		return nil, err
+	}
+	config.Mode = getNoteType(*bookmark, *dump, *todo)
+	if config.Global {
+		config.Notespath = filepath.Join(getenv("NOTESPATH"), defaultFilename)
+	}
+	return config, err
+}
+
+func getNoteType(bookmark, dump, todo bool) string {
+	if bookmark {
+		return "bookmark"
+	} else if dump {
+		return "dump"
+	} else if todo {
+		return "todo"
+	}
+	return "dump"
+}
+
+func getDefaultFilepath(filename string) (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Join(dir, filename), nil
 }
