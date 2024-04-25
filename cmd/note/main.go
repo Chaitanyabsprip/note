@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"os/signal"
 
@@ -23,6 +24,10 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 	_, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 	// parse configuration
+	if len(args) < 2 {
+		log.Fatal("Invalid Usage")
+		os.Exit(1)
+	}
 	config, err := ParseArgs(args[1:], getenv)
 	if err != nil {
 		return 1, err
