@@ -29,7 +29,6 @@ func ParseArgs(args []string, getenv func(string) string) (*Config, error) {
 		}
 	}
 	determineFilepath(config, getenv)
-	fmt.Println(config.Mode)
 	return config, err
 }
 
@@ -84,7 +83,6 @@ func parsePreviewArgs(flags *getopt.FlagSet, args []string) (*Config, error) {
 }
 
 func getNoteType(bookmark, dump, todo bool) string {
-	fmt.Println(bookmark, dump, todo)
 	if bookmark {
 		return "bookmark"
 	} else if dump {
