@@ -70,19 +70,10 @@ func GetHeadings(file *os.File, numOfHeadings int, level int) (string, error) {
 			return "", err
 		}
 		if bytesRead > 0 {
-			datas := fmt.Sprint(string(readBuffer), overflow)
-			matches := strings.Count(datas, sep)
-			count += matches
-			if count > numOfHeadings {
-				targetString := splitAfterN(datas, sep, count-numOfHeadings+2)
-				out = fmt.Sprint(sep, targetString, out)
+			count, out, overflow = parsePartialHeadings(readBuffer, count, numOfHeadings, sep, out, overflow)
+			if count == numOfHeadings {
 				return out, nil
 			}
-			before, after, exists := strings.Cut(datas, sep)
-			if exists {
-				out = fmt.Sprint(sep, after, out)
-			}
-			overflow = before
 		}
 		offset += BUFSIZE
 	}
@@ -112,6 +103,29 @@ func readBefore(file io.ReadSeeker, offset int64, readBuffer []byte) (int, error
 		return 0, err
 	}
 	return bytesRead, nil
+}
+
+func parsePartialHeadings(
+	readBuffer []byte,
+	count, numOfHeadings int,
+	sep,
+	out,
+	overflow string,
+) (int, string, string) {
+	datas := fmt.Sprint(string(readBuffer), overflow)
+	matches := strings.Count(datas, sep)
+	count += matches
+	if count > numOfHeadings {
+		targetString := splitAfterN(datas, sep, count-numOfHeadings+2)
+		out = fmt.Sprint(sep, targetString, out)
+		return numOfHeadings, out, overflow
+	}
+	before, after, exists := strings.Cut(datas, sep)
+	if exists {
+		out = fmt.Sprint(sep, after, out)
+	}
+	overflow = before
+	return count, out, overflow
 }
 
 func splitAfterN(s, sep string, n int) string {
