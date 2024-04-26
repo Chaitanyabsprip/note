@@ -171,15 +171,23 @@ func newHeading(file *os.File) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	lines := strings.Split(content, "")
-	lHeading := lines[len(lines)-1]
-	firstEntry := lHeading == ""
+	lines := strings.Split(content, "\n")
+	lHeading := lastHeading(lines)
 	prevTime := strings.TrimPrefix(lHeading, "## ")
 	currTime := time.Now().Format("Mon, 02 Jan 2006")
-	if currTime != prevTime || firstEntry {
+	if currTime != prevTime || lHeading == "" {
 		return fmt.Sprint("## ", currTime), nil
 	}
 	return "", nil
+}
+
+func lastHeading(lines []string) string {
+	for _, line := range lines {
+		if strings.HasPrefix(line, "##") {
+			return line
+		}
+	}
+	return ""
 }
 
 func wordWrap(text string, lineWidth int) string {
