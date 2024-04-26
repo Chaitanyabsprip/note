@@ -77,13 +77,12 @@ func GetHeadings(file *os.File, numOfHeadings int, level int) (string, error) {
 				targetString := splitAfterN(datas, sep, count-numOfHeadings+2)
 				out = fmt.Sprint(sep, targetString, out)
 				return out, nil
-			} else {
-				before, after, exists := strings.Cut(datas, sep)
-				if exists {
-					out = fmt.Sprint(sep, after, out)
-				}
-				overflow = before
 			}
+			before, after, exists := strings.Cut(datas, sep)
+			if exists {
+				out = fmt.Sprint(sep, after, out)
+			}
+			overflow = before
 		}
 		offset += BUFSIZE
 	}
