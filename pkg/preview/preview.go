@@ -41,7 +41,7 @@ func (p *Preview) Peek() error {
 		return err
 	}
 	defer file.Close()
-	content, err := ReadHeadings(file, p.NumOfHeadings, p.Level)
+	content, err := GetHeadings(file, p.NumOfHeadings, p.Level)
 	if err != nil {
 		return err
 	}
@@ -49,7 +49,7 @@ func (p *Preview) Peek() error {
 	return nil
 }
 
-func ReadHeadings(file *os.File, numOfHeadings int, level int) (string, error) {
+func GetHeadings(file *os.File, numOfHeadings int, level int) (string, error) {
 	fileInfo, err := file.Stat()
 	if err != nil {
 		return "", err

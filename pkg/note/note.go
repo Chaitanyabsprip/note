@@ -167,7 +167,7 @@ func maybeOpenEditor(editFile bool, filepath, editorCommand string) {
 }
 
 func newHeading(file *os.File) (string, error) {
-	content, err := preview.ReadHeadings(file, 1, 2)
+	content, err := preview.GetHeadings(file, 1, 2)
 	if err != nil {
 		return "", err
 	}
@@ -224,7 +224,7 @@ func sentenceCase(input string) string {
 }
 
 func render(file *os.File) error {
-	content, err := preview.ReadHeadings(file, 1, 2)
+	content, err := preview.GetHeadings(file, 1, 2)
 	if err != nil {
 		return err
 	}
