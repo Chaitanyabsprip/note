@@ -58,36 +58,27 @@ func GetHeadings(file *os.File, numOfHeadings int, level int) (string, error) {
 	filesize := fileInfo.Size()
 	heading := strings.Repeat("#", level)
 	sep := fmt.Sprintf("\n%s ", heading)
+	var prevOffset int64 = 0
 	offset := BUFSIZE
 	count := 0
 	out := ""
 	readBuffer := make([]byte, BUFSIZE)
 	overflow := ""
-	for offset < filesize {
+	for offset < filesize+BUFSIZE {
 		var bytesRead int
-		bytesRead, err = readBefore(file, offset, readBuffer)
+		bytesRead, err = readBefore(file, min(offset, filesize), readBuffer)
 		if err != nil {
 			return "", err
 		}
 		if bytesRead > 0 {
-			count, out, overflow = parsePartialHeadings(readBuffer, count, numOfHeadings, sep, out, overflow)
+			readString := string(readBuffer[:min(filesize, offset)-prevOffset])
+			count, out, overflow = parsePartialHeadings(readString, sep, out, overflow, count, numOfHeadings)
 			if count == numOfHeadings {
 				return out, nil
 			}
 		}
+		prevOffset = offset
 		offset += BUFSIZE
-	}
-	_, err = file.Seek(0, io.SeekStart)
-	if err != nil {
-		return "", err
-	}
-	bytesRead, err := file.Read(readBuffer)
-	if err != nil {
-		return "", err
-	}
-	if bytesRead > 0 {
-		readBuffer = readBuffer[:filesize-offset+BUFSIZE]
-		out = fmt.Sprint(string(readBuffer), overflow, out)
 	}
 	return out, nil
 }
@@ -106,13 +97,13 @@ func readBefore(file io.ReadSeeker, offset int64, readBuffer []byte) (int, error
 }
 
 func parsePartialHeadings(
-	readBuffer []byte,
-	count, numOfHeadings int,
+	readString,
 	sep,
 	out,
 	overflow string,
+	count, numOfHeadings int,
 ) (int, string, string) {
-	datas := fmt.Sprint(string(readBuffer), overflow)
+	datas := fmt.Sprint(readString, overflow)
 	matches := strings.Count(datas, sep)
 	count += matches
 	if count > numOfHeadings {
