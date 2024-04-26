@@ -55,21 +55,17 @@ func GetHeadings(file *os.File, numOfHeadings int, level int) (string, error) {
 		return "", err
 	}
 
+	filesize := fileInfo.Size()
 	heading := strings.Repeat("#", level)
 	sep := fmt.Sprintf("\n%s ", heading)
-	filesize := fileInfo.Size()
 	offset := BUFSIZE
 	count := 0
 	out := ""
 	readBuffer := make([]byte, BUFSIZE)
 	overflow := ""
 	for offset < filesize {
-		_, err = file.Seek(-offset, io.SeekEnd)
-		if err != nil {
-			return "", err
-		}
 		var bytesRead int
-		bytesRead, err = file.Read(readBuffer)
+		bytesRead, err = readBefore(file, offset, readBuffer)
 		if err != nil {
 			return "", err
 		}
@@ -104,6 +100,19 @@ func GetHeadings(file *os.File, numOfHeadings int, level int) (string, error) {
 		out = fmt.Sprint(string(readBuffer), overflow, out)
 	}
 	return out, nil
+}
+
+func readBefore(file io.ReadSeeker, offset int64, readBuffer []byte) (int, error) {
+	_, err := file.Seek(-offset, io.SeekEnd)
+	if err != nil {
+		return 0, err
+	}
+	var bytesRead int
+	bytesRead, err = file.Read(readBuffer)
+	if err != nil {
+		return 0, err
+	}
+	return bytesRead, nil
 }
 
 func splitAfterN(s, sep string, n int) string {
