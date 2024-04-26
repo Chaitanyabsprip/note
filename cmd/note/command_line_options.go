@@ -10,11 +10,18 @@ import (
 	"rsc.io/getopt"
 )
 
-func ParseArgs(args []string, getenv func(string) string) (*Config, error) {
+type ConfigurationParser struct {
+	exit   func(int)
+	getenv func(string) string
+	getwd  func() (string, error)
+	args   []string
+}
+
+func (cp ConfigurationParser) ParseArgs() (*Config, error) {
 	var config *Config
 	var err error
 	root := getopt.NewFlagSet("note", flag.ContinueOnError)
-	config, err = parseRootArgs(root, args)
+	config, err = parseRootArgs(root, cp.args)
 	if err != nil {
 		return nil, err
 	}
@@ -28,7 +35,7 @@ func ParseArgs(args []string, getenv func(string) string) (*Config, error) {
 			return nil, err
 		}
 	}
-	determineFilepath(config, getenv)
+	cp.determineFilepath(config, cp.getenv)
 	return config, err
 }
 
@@ -93,9 +100,9 @@ func getNoteType(bookmark, dump, todo bool) string {
 	return "dump"
 }
 
-func determineFilepath(config *Config, getenv func(string) string) error {
+func (cp ConfigurationParser) determineFilepath(config *Config, getenv func(string) string) error {
 	defaultFilename := fmt.Sprint("notes.", config.Mode, ".md")
-	defaultFilepath, err := getDefaultFilepath(defaultFilename)
+	defaultFilepath, err := cp.getDefaultFilepath(defaultFilename)
 	if err != nil {
 		return err
 	}
@@ -119,8 +126,8 @@ func addHelpFlags(flags *getopt.FlagSet) {
 	flags.Alias("h", "help")
 }
 
-func getDefaultFilepath(filename string) (string, error) {
-	dir, err := os.Getwd()
+func (cp ConfigurationParser) getDefaultFilepath(filename string) (string, error) {
+	dir, err := cp.getwd()
 	if err != nil {
 		return "", err
 	}

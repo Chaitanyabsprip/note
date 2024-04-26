@@ -28,7 +28,13 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 		log.Fatal("Invalid Usage")
 		os.Exit(1)
 	}
-	config, err := ParseArgs(args[1:], getenv)
+	cp := ConfigurationParser{
+		exit:   os.Exit,
+		getenv: getenv,
+		getwd:  os.Getwd,
+		args:   args[1:],
+	}
+	config, err := cp.ParseArgs()
 	if err != nil {
 		return 1, err
 	}
@@ -37,7 +43,8 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 		p := preview.New(w, config.Mode, config.Notespath, config.NumOfHeadings, config.Level)
 		err = p.Peek()
 	} else {
-		n, err := note.New(config.Content, config.Mode, config.Notespath, config.EditFile, config.Quiet)
+		var n note.Note
+		n, err = note.New(config.Content, config.Mode, config.Notespath, config.EditFile, config.Quiet)
 		if err != nil {
 			return 1, err
 		}
