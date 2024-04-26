@@ -226,7 +226,7 @@ func sentenceCase(input string) string {
 		sentence = strings.ToLower(sentence)
 		sb.WriteString(strings.ToUpper(string(sentence[0])))
 		sb.WriteString(sentence[1:])
-		sb.WriteString(". ")
+		sb.WriteString("\n")
 	}
 	return strings.TrimSpace(sb.String())
 }
