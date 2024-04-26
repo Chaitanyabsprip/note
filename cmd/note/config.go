@@ -2,7 +2,7 @@ package main
 
 type Config struct {
 	Content         string
-	Mode            string
+	Type            string
 	Notespath       string
 	defaultFilename string
 	Level           int

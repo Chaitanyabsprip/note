@@ -40,11 +40,11 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 	}
 	// call application
 	if args[1] == "peek" {
-		p := preview.New(w, config.Mode, config.Notespath, config.NumOfHeadings, config.Level)
+		p := preview.New(w, config.Type, config.Notespath, config.NumOfHeadings, config.Level)
 		err = p.Peek()
 	} else {
 		var n note.Note
-		n, err = note.New(config.Content, config.Mode, config.Notespath, config.EditFile, config.Quiet)
+		n, err = note.New(config.Content, config.Type, config.Notespath, config.EditFile, config.Quiet)
 		if err != nil {
 			return 1, err
 		}

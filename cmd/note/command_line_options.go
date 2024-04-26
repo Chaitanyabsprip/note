@@ -41,7 +41,7 @@ func (cp ConfigurationParser) ParseArgs() (*Config, error) {
 
 func parseRootArgs(flags *getopt.FlagSet, args []string) (*Config, error) {
 	config := new(Config)
-	config.Mode = "dump"
+	config.Type = "dump"
 	addHelpFlags(flags)
 	bookmark := flags.Bool("bookmark", false, "Add new bookmark")
 	flags.Alias("b", "bookmark")
@@ -60,14 +60,14 @@ func parseRootArgs(flags *getopt.FlagSet, args []string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	config.Mode = getNoteType(*bookmark, *dump, *todo)
+	config.Type = getNoteType(*bookmark, *dump, *todo)
 	config.Content = strings.Join(flags.Args(), " ")
 	return config, nil
 }
 
 func parsePreviewArgs(flags *getopt.FlagSet, args []string) (*Config, error) {
 	config := new(Config)
-	config.Mode = "dump"
+	config.Type = "dump"
 	addHelpFlags(flags)
 	bookmark := flags.Bool("bookmark", false, "Add new bookmark")
 	flags.Alias("b", "bookmark")
@@ -85,7 +85,7 @@ func parsePreviewArgs(flags *getopt.FlagSet, args []string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	config.Mode = getNoteType(*bookmark, *dump, *todo)
+	config.Type = getNoteType(*bookmark, *dump, *todo)
 	return config, err
 }
 
@@ -101,7 +101,7 @@ func getNoteType(bookmark, dump, todo bool) string {
 }
 
 func (cp ConfigurationParser) determineFilepath(config *Config, getenv func(string) string) error {
-	defaultFilename := fmt.Sprint("notes.", config.Mode, ".md")
+	defaultFilename := fmt.Sprint("notes.", config.Type, ".md")
 	defaultFilepath, err := cp.getDefaultFilepath(defaultFilename)
 	if err != nil {
 		return err

@@ -51,87 +51,87 @@ var (
 		{
 			"-f <path> flag should configure Mode: dump",
 			[]string{"-f", tAltNotespath},
-			withDefaults(Config{Mode: "dump", Notespath: tAltNotespath}),
+			withDefaults(Config{Type: "dump", Notespath: tAltNotespath}),
 		},
 		{
 			"-t flag should configure Mode: todo",
 			[]string{"-t"},
-			withDefaults(Config{Mode: "todo", Notespath: getFilepath("todo")}),
+			withDefaults(Config{Type: "todo", Notespath: getFilepath("todo")}),
 		},
 		{
 			"-b flag should configure Mode: bookmark",
 			[]string{"-b"},
-			withDefaults(Config{Mode: "bookmark", Notespath: getFilepath("bookmark")}),
+			withDefaults(Config{Type: "bookmark", Notespath: getFilepath("bookmark")}),
 		},
 		{
 			"-d flag should configure Mode: dump",
 			[]string{"-d"},
-			withDefaults(Config{Mode: "dump", Notespath: getFilepath("dump")}),
+			withDefaults(Config{Type: "dump", Notespath: getFilepath("dump")}),
 		},
 		{
 			"-q flag should configure Quiet: true",
 			[]string{"-q"},
-			withDefaults(Config{Mode: "dump", Notespath: getFilepath("dump"), Quiet: true}),
+			withDefaults(Config{Type: "dump", Notespath: getFilepath("dump"), Quiet: true}),
 		},
 		{
 			"-ge flag should configure Global: true, EditFile: true",
 			[]string{"-ge"},
-			withDefaults(Config{Mode: "dump", Notespath: getFilepath("dump"), Global: true, EditFile: true}),
+			withDefaults(Config{Type: "dump", Notespath: getFilepath("dump"), Global: true, EditFile: true}),
 		},
 		{
 			"-gt flag should configure Mode: todo, Global: true",
 			[]string{"-gt"},
-			withDefaults(Config{Mode: "todo", Notespath: getFilepath("todo"), Global: true}),
+			withDefaults(Config{Type: "todo", Notespath: getFilepath("todo"), Global: true}),
 		},
 		{
 			"-gb flag should configure Mode: bookmark, Global: true",
 			[]string{"-gb"},
-			withDefaults(Config{Mode: "bookmark", Notespath: getFilepath("bookmark"), Global: true}),
+			withDefaults(Config{Type: "bookmark", Notespath: getFilepath("bookmark"), Global: true}),
 		},
 		{
 			"-gd flag should configure Mode: dump, Global: true",
 			[]string{"-gd"},
-			withDefaults(Config{Mode: "dump", Notespath: getFilepath("dump"), Global: true}),
+			withDefaults(Config{Type: "dump", Notespath: getFilepath("dump"), Global: true}),
 		},
 		{
 			"-te flag should configure Mode: todo, EditFile: true",
 			[]string{"-te"},
-			withDefaults(Config{Mode: "todo", Notespath: getFilepath("todo"), EditFile: true}),
+			withDefaults(Config{Type: "todo", Notespath: getFilepath("todo"), EditFile: true}),
 		},
 		{
 			"-be flag should configure Mode: bookmark, Editfile: true",
 			[]string{"-be"},
-			withDefaults(Config{Mode: "bookmark", Notespath: getFilepath("bookmark"), EditFile: true}),
+			withDefaults(Config{Type: "bookmark", Notespath: getFilepath("bookmark"), EditFile: true}),
 		},
 		{
 			"-de flag should configure Mode: dump, EditFile: true",
 			[]string{"-de"},
-			withDefaults(Config{Mode: "dump", Notespath: getFilepath("dump"), EditFile: true}),
+			withDefaults(Config{Type: "dump", Notespath: getFilepath("dump"), EditFile: true}),
 		},
 		{
 			"-gte flag should configure Mode: todo, Global: true, EditFile: true",
 			[]string{"-gte"},
-			withDefaults(Config{Mode: "todo", Notespath: getFilepath("todo"), EditFile: true, Global: true}),
+			withDefaults(Config{Type: "todo", Notespath: getFilepath("todo"), EditFile: true, Global: true}),
 		},
 		{
 			"-gbe flag should configure Mode: bookmark, Global: true, EditFile: true",
 			[]string{"-gbe"},
-			withDefaults(Config{Mode: "bookmark", Notespath: getFilepath("bookmark"), EditFile: true, Global: true}),
+			withDefaults(Config{Type: "bookmark", Notespath: getFilepath("bookmark"), EditFile: true, Global: true}),
 		},
 		{
 			"-gde flag should configure Mode: dump, Global: true, EditFile: true",
 			[]string{"-gde"},
-			withDefaults(Config{Mode: "dump", Notespath: getFilepath("dump"), EditFile: true, Global: true}),
+			withDefaults(Config{Type: "dump", Notespath: getFilepath("dump"), EditFile: true, Global: true}),
 		},
 		{
 			"-ef <path> flag should configure Mode: dump, Global: true, EditFile: true",
 			[]string{"-ef", tAltNotespath},
-			withDefaults(Config{Mode: "dump", Notespath: tAltNotespath, EditFile: true}),
+			withDefaults(Config{Type: "dump", Notespath: tAltNotespath, EditFile: true}),
 		},
 		{
 			"-ef <path> flag should configure Mode: dump, Global: true, EditFile: true",
 			[]string{"-ef", tAltNotespath},
-			withDefaults(Config{Mode: "dump", Notespath: tAltNotespath, EditFile: true}),
+			withDefaults(Config{Type: "dump", Notespath: tAltNotespath, EditFile: true}),
 		},
 	}
 )
@@ -142,8 +142,8 @@ func tGetenv(_ string) string {
 
 func withDefaults(config Config) Config {
 	updatedConfig := config
-	if updatedConfig.Mode == "" {
-		updatedConfig.Mode = "dump"
+	if updatedConfig.Type == "" {
+		updatedConfig.Type = "dump"
 	}
 	if updatedConfig.Notespath == "" {
 		updatedConfig.Notespath = tNotespath
