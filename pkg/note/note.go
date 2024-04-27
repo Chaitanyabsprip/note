@@ -42,29 +42,34 @@ func (n Note) validate() error {
 }
 
 func (n Note) Note() error {
-	var noteType noteType
+	var note noteType
 	switch n.Type {
 	case "bookmark":
-		noteType = bookmark{}
+		note = bookmark{}
 	case "dump":
-		noteType = notes{}
+		note = notes{}
 	case "todo":
-		noteType = todo{}
+		note = todo{}
 	default:
 		fmt.Fprintln(os.Stdout, "nothing to do")
 		return nil
 	}
-	setupFile(n.NotesPath, noteType.label())
+	setupFile(n.NotesPath, note.label())
 	maybeOpenEditor(n.EditFile, n.NotesPath, "nvim")
 	file, err := os.OpenFile(n.NotesPath, os.O_APPEND|os.O_RDWR, 0o644)
 	if err != nil {
 		return err
 	}
-	note, err := noteType.note(n.Content, file)
+	defer file.Close()
+	markdown, err := note.toMarkdown(n.Content, file)
 	if err != nil {
 		return err
 	}
-	_, err = file.WriteString(note)
+	markdown, err = addHeading(markdown, file)
+	if err != nil {
+		return err
+	}
+	_, err = file.WriteString(markdown)
 	if err != nil {
 		return err
 	}
@@ -76,7 +81,7 @@ func (n Note) Note() error {
 
 type noteType interface {
 	label() string
-	note(string, *os.File) (string, error)
+	toMarkdown(string, *os.File) (string, error)
 }
 
 type bookmark struct{}
@@ -85,16 +90,8 @@ func (bookmark) label() string {
 	return "Bookmarks"
 }
 
-func (bookmark) note(content string, file *os.File) (string, error) {
-	heading, err := newHeading(file)
-	if err != nil {
-		return "", err
-	}
-	note := content
-	if heading != "" {
-		note = fmt.Sprintf("\n%s\n\n%s", heading, content)
-	}
-	return fmt.Sprintln(note), nil
+func (bookmark) toMarkdown(content string, file *os.File) (string, error) {
+	return fmt.Sprintln("<", content, ">"), nil
 }
 
 type notes struct{}
@@ -103,15 +100,8 @@ func (notes) label() string {
 	return "Notes"
 }
 
-func (notes) note(content string, file *os.File) (string, error) {
-	heading, err := newHeading(file)
-	if err != nil {
-		return "", err
-	}
+func (notes) toMarkdown(content string, file *os.File) (string, error) {
 	note := wordWrap(sentenceCase(content), 80)
-	if heading != "" {
-		note = fmt.Sprintf("\n%s\n\n%s", heading, note)
-	}
 	note = fmt.Sprintln(note)
 	return note, nil
 }
@@ -122,16 +112,8 @@ func (todo) label() string {
 	return "Todo"
 }
 
-func (todo) note(content string, file *os.File) (string, error) {
-	heading, err := newHeading(file)
-	if err != nil {
-		return "", err
-	}
-
+func (todo) toMarkdown(content string, file *os.File) (string, error) {
 	note := wordWrap(fmt.Sprint("- [ ] ", sentenceCase(content)), 80)
-	if heading != "" {
-		note = fmt.Sprintf("\n%s\n\n%s", heading, note)
-	}
 	note = fmt.Sprintln(note)
 	return note, nil
 }
@@ -164,6 +146,18 @@ func maybeOpenEditor(editFile bool, filepath, editorCommand string) {
 		os.Exit(1)
 	}
 	os.Exit(0)
+}
+
+func addHeading(body string, file *os.File) (string, error) {
+	heading, err := newHeading(file)
+	if err != nil {
+		return "", err
+	}
+	note := body
+	if heading != "" {
+		note = fmt.Sprintf("\n%s\n\n%s", heading, note)
+	}
+	return note, nil
 }
 
 func newHeading(file *os.File) (string, error) {
