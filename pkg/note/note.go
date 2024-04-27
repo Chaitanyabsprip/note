@@ -91,7 +91,7 @@ func (bookmark) label() string {
 }
 
 func (bookmark) toMarkdown(content string, file *os.File) (string, error) {
-	return fmt.Sprintln("<", content, ">"), nil
+	return fmt.Sprint("[](", content, ")\n\n"), nil
 }
 
 type notes struct{}
