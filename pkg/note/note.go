@@ -55,15 +55,15 @@ func (n Note) Note() error {
 	}
 	setupFile(n.NotesPath, note.label())
 	maybeOpenEditor(n.EditFile, n.NotesPath, "nvim")
+	markdown, err := note.toMarkdown(n.Content)
+	if err != nil {
+		return err
+	}
 	file, err := os.OpenFile(n.NotesPath, os.O_APPEND|os.O_RDWR, 0o644)
 	if err != nil {
 		return err
 	}
 	defer file.Close()
-	markdown, err := note.toMarkdown(n.Content, file)
-	if err != nil {
-		return err
-	}
 	markdown, err = addHeading(markdown, file)
 	if err != nil {
 		return err
@@ -80,7 +80,7 @@ func (n Note) Note() error {
 
 type noteType interface {
 	label() string
-	toMarkdown(string, *os.File) (string, error)
+	toMarkdown(string) (string, error)
 }
 
 type bookmark struct{}
@@ -89,7 +89,7 @@ func (bookmark) label() string {
 	return "Bookmarks"
 }
 
-func (bookmark) toMarkdown(content string, file *os.File) (string, error) {
+func (bookmark) toMarkdown(content string) (string, error) {
 	return fmt.Sprint("[](", content, ")\n\n"), nil
 }
 
@@ -99,7 +99,7 @@ func (notes) label() string {
 	return "Notes"
 }
 
-func (notes) toMarkdown(content string, file *os.File) (string, error) {
+func (notes) toMarkdown(content string) (string, error) {
 	note := wordWrap(sentenceCase(content), 80)
 	note = fmt.Sprintln(note)
 	return note, nil
@@ -111,7 +111,7 @@ func (todo) label() string {
 	return "Todo"
 }
 
-func (todo) toMarkdown(content string, file *os.File) (string, error) {
+func (todo) toMarkdown(content string) (string, error) {
 	note := wordWrap(fmt.Sprint("- [ ] ", sentenceCase(content)), 80)
 	note = fmt.Sprintln(note)
 	return note, nil
