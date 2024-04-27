@@ -41,16 +41,8 @@ func (n Note) validate() error {
 }
 
 func (n Note) Note() error {
-	var note noteType
-	switch n.Type {
-	case "bookmark":
-		note = bookmark{}
-	case "dump":
-		note = notes{}
-	case "todo":
-		note = todo{}
-	default:
-		fmt.Fprintln(os.Stdout, "nothing to do")
+	note := getNoteType(n.Type)
+	if note == nil {
 		return nil
 	}
 	setupFile(n.NotesPath, note.label())
@@ -78,43 +70,20 @@ func (n Note) Note() error {
 	return nil
 }
 
-type noteType interface {
-	label() string
-	toMarkdown(string) (string, error)
-}
-
-type bookmark struct{}
-
-func (bookmark) label() string {
-	return "Bookmarks"
-}
-
-func (bookmark) toMarkdown(content string) (string, error) {
-	return fmt.Sprint("[](", content, ")\n\n"), nil
-}
-
-type notes struct{}
-
-func (notes) label() string {
-	return "Notes"
-}
-
-func (notes) toMarkdown(content string) (string, error) {
-	note := wordWrap(sentenceCase(content), 80)
-	note = fmt.Sprintln(note)
-	return note, nil
-}
-
-type todo struct{}
-
-func (todo) label() string {
-	return "Todo"
-}
-
-func (todo) toMarkdown(content string) (string, error) {
-	note := wordWrap(fmt.Sprint("- [ ] ", sentenceCase(content)), 80)
-	note = fmt.Sprintln(note)
-	return note, nil
+func getNoteType(_type string) noteType {
+	var note noteType
+	switch _type {
+	case "bookmark":
+		note = bookmark{}
+	case "dump":
+		note = notes{}
+	case "todo":
+		note = todo{}
+	default:
+		fmt.Fprintln(os.Stdout, "nothing to do")
+		return nil
+	}
+	return note
 }
 
 func setupFile(filepath, label string) {
