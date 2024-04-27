@@ -17,7 +17,7 @@ type Note struct {
 	Type        string
 	NotesPath   string
 	EditFile    bool
-	ShowPreview bool
+	HidePreview bool
 }
 
 func New(content, _type, notesPath string, editFile, showPreview bool) (Note, error) {
@@ -26,7 +26,7 @@ func New(content, _type, notesPath string, editFile, showPreview bool) (Note, er
 	n.Type = _type
 	n.NotesPath = notesPath
 	n.EditFile = editFile
-	n.ShowPreview = showPreview
+	n.HidePreview = showPreview
 	err := n.validate()
 	if err != nil {
 		return Note{}, err
@@ -68,7 +68,7 @@ func (n Note) Note() error {
 	if err != nil {
 		return err
 	}
-	if !n.ShowPreview {
+	if !n.HidePreview {
 		render(file)
 	}
 	return nil
