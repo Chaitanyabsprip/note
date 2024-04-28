@@ -5,6 +5,7 @@ go 1.21.0
 require (
 	github.com/charmbracelet/glamour v0.7.0
 	rsc.io/getopt v0.0.0-20170811000552-20be20937449
+	golang.org/x/net v0.24.0
 )
 
 require (
@@ -23,6 +24,5 @@ require (
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/yuin/goldmark v1.7.1 // indirect
 	github.com/yuin/goldmark-emoji v1.0.2 // indirect
-	golang.org/x/net v0.24.0 // indirect
 	golang.org/x/sys v0.19.0 // indirect
 )
