@@ -24,17 +24,8 @@ func (bookmark) label() string {
 
 func (b bookmark) toMarkdown(content string) (string, error) {
 	title := fetchWebpageTitle(content)
-	var sb strings.Builder
-	sb.WriteString("\n[")
-	sb.WriteString(title)
-	sb.WriteString("](")
-	sb.WriteString(content)
-	sb.WriteString(")  \n")
-	sb.WriteString("tags: ")
-	sb.WriteString(strings.Join(b.tags, ", "))
-	sb.WriteString("  \n")
-	sb.WriteString(b.description)
-	return sb.String(), nil
+	tags := strings.Join(b.tags, ", ")
+	return fmt.Sprintf("\n[%s](%s)  \ntags: %s  \n%s", title, content, tags, b.description), nil
 }
 
 func fetchWebpageTitle(url string) string {
