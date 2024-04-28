@@ -125,10 +125,18 @@ func splitAfterN(s, sep string, n int) string {
 }
 
 func Render(w io.Writer, in string) error {
-	out, err := glamour.Render(in, "dark")
-	fmt.Fprintln(w, out)
+	renderer, err := glamour.NewTermRenderer(
+		glamour.WithStylePath(glamour.DarkStyle),
+		glamour.WithWordWrap(120),
+		glamour.WithPreservedNewLines(),
+	)
 	if err != nil {
 		return err
 	}
+	out, err := renderer.Render(in)
+	if err != nil {
+		return err
+	}
+	fmt.Fprintln(w, out)
 	return nil
 }
