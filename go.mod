@@ -4,8 +4,8 @@ go 1.21.0
 
 require (
 	github.com/charmbracelet/glamour v0.7.0
-	rsc.io/getopt v0.0.0-20170811000552-20be20937449
 	golang.org/x/net v0.24.0
+	rsc.io/getopt v0.0.0-20170811000552-20be20937449
 )
 
 require (

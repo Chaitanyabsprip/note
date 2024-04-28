@@ -49,6 +49,13 @@ func parseRootArgs(flags *getopt.FlagSet, args []string) (*Config, error) {
 	flags.Alias("d", "dump")
 	todo := flags.Bool("todo", false, "Add new todo")
 	flags.Alias("t", "todo")
+	flags.StringVar(&config.Description, "desc", "", "Add description for bookmarks")
+	flags.Alias("D", "desc")
+	flags.Func("tags", "Add tags for bookmarks", func(s string) error {
+		config.Tags = append(config.Tags, strings.Split(s, ",")...)
+		return nil
+	})
+	flags.Alias("T", "tags")
 	flags.BoolVar(&config.Global, "g", false, "Use global notes")
 	flags.BoolVar(&config.Quiet, "quiet", false, "Minimise output")
 	flags.Alias("q", "quiet")

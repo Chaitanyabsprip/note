@@ -78,7 +78,10 @@ func (n Note) getNoteType() noteType {
 	var note noteType
 	switch n.Type {
 	case "bookmark":
-		note = bookmark{}
+		note = bookmark{
+			description: n.Description,
+			tags:        n.Tags,
+		}
 	case "dump":
 		note = notes{}
 	case "todo":
