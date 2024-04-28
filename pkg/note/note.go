@@ -13,19 +13,23 @@ import (
 
 type Note struct {
 	Content     string
-	Type        string
+	Description string
 	NotesPath   string
+	Type        string
+	Tags        []string
 	EditFile    bool
 	HidePreview bool
 }
 
-func New(content, _type, notesPath string, editFile, showPreview bool) (Note, error) {
+func New(content, description, notesPath, _type string, tags []string, editFile, showPreview bool) (Note, error) {
 	n := new(Note)
 	n.Content = content
-	n.Type = _type
-	n.NotesPath = notesPath
+	n.Description = description
 	n.EditFile = editFile
 	n.HidePreview = showPreview
+	n.NotesPath = notesPath
+	n.Tags = tags
+	n.Type = _type
 	err := n.validate()
 	if err != nil {
 		return Note{}, err

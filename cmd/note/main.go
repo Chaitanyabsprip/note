@@ -44,7 +44,15 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 		err = p.Peek()
 	} else {
 		var n note.Note
-		n, err = note.New(config.Content, config.Type, config.Notespath, config.EditFile, config.Quiet)
+		n, err = note.New(
+			config.Content,
+			config.Notespath,
+			config.Description,
+			config.Type,
+			config.Tags,
+			config.EditFile,
+			config.Quiet,
+		)
 		if err != nil {
 			return 1, err
 		}

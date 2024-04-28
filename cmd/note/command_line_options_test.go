@@ -23,7 +23,7 @@ func TestFlagParser(t *testing.T) {
 			}
 			t.Logf("config: %#+v\n", *config)
 			t.Logf("tC.config: %#+v\n", tC.config)
-			if *config != tC.config {
+			if !config.Equals(tC.config) {
 				t.Fail()
 			}
 		})
