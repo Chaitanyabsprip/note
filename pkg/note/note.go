@@ -77,14 +77,14 @@ func (n Note) Note() error {
 func (n Note) getNoteType() noteType {
 	var note noteType
 	switch n.Type {
-	case "bookmark":
+	case Bookmark:
 		note = bookmark{
 			description: n.Description,
 			tags:        n.Tags,
 		}
-	case "dump":
+	case Dump:
 		note = notes{}
-	case "todo":
+	case Todo:
 		note = todo{}
 	default:
 		fmt.Fprintln(os.Stdout, "nothing to do")

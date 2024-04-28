@@ -8,6 +8,12 @@ import (
 	"golang.org/x/net/html"
 )
 
+const (
+	Bookmark = "bookmark"
+	Todo     = "todo"
+	Dump     = "dump"
+)
+
 type noteType interface {
 	label() string
 	toMarkdown(string) (string, error)
