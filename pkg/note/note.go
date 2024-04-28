@@ -41,7 +41,7 @@ func (n Note) validate() error {
 }
 
 func (n Note) Note() error {
-	note := getNoteType(n.Type)
+	note := n.getNoteType()
 	if note == nil {
 		return nil
 	}
@@ -70,9 +70,9 @@ func (n Note) Note() error {
 	return nil
 }
 
-func getNoteType(_type string) noteType {
+func (n Note) getNoteType() noteType {
 	var note noteType
-	switch _type {
+	switch n.Type {
 	case "bookmark":
 		note = bookmark{}
 	case "dump":
