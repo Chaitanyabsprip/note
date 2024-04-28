@@ -46,8 +46,8 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 		var n note.Note
 		n, err = note.New(
 			config.Content,
-			config.Notespath,
 			config.Description,
+			config.Notespath,
 			config.Type,
 			config.Tags,
 			config.EditFile,
