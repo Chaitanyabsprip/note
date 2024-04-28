@@ -1,6 +1,12 @@
 package note
 
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+	"strings"
+
+	"golang.org/x/net/html"
+)
 
 type noteType interface {
 	label() string
@@ -13,8 +19,36 @@ func (bookmark) label() string {
 	return "Bookmarks"
 }
 
-func (bookmark) toMarkdown(content string) (string, error) {
-	return fmt.Sprint("[](", content, ")\n\n"), nil
+func (b bookmark) toMarkdown(content string) (string, error) {
+	title := fetchWebpageTitle(content)
+	var sb strings.Builder
+	sb.WriteString(fmt.Sprint("- [", title, "](", content, ")\n\n"))
+	return sb.String(), nil
+}
+
+func fetchWebpageTitle(url string) string {
+	resp, err := http.Get(url)
+	if err != nil {
+		return ""
+	}
+	defer resp.Body.Close()
+	doc, err := html.Parse(resp.Body)
+	if err != nil {
+		return ""
+	}
+	var title string
+	var traverse func(*html.Node)
+	traverse = func(n *html.Node) {
+		if n.Type == html.ElementNode && n.Data == "title" && n.Parent != nil && n.Parent.Data == "head" {
+			title = n.FirstChild.Data
+			return
+		}
+		for c := n.FirstChild; c != nil; c = c.NextSibling {
+			traverse(c)
+		}
+	}
+	traverse(doc)
+	return title
 }
 
 type notes struct{}
