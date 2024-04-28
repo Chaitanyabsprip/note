@@ -13,7 +13,10 @@ type noteType interface {
 	toMarkdown(string) (string, error)
 }
 
-type bookmark struct{}
+type bookmark struct {
+	description string
+	tags        []string
+}
 
 func (bookmark) label() string {
 	return "Bookmarks"
@@ -22,7 +25,15 @@ func (bookmark) label() string {
 func (b bookmark) toMarkdown(content string) (string, error) {
 	title := fetchWebpageTitle(content)
 	var sb strings.Builder
-	sb.WriteString(fmt.Sprint("- [", title, "](", content, ")\n\n"))
+	sb.WriteString("\n[")
+	sb.WriteString(title)
+	sb.WriteString("](")
+	sb.WriteString(content)
+	sb.WriteString(")  \n")
+	sb.WriteString("tags: ")
+	sb.WriteString(strings.Join(b.tags, ", "))
+	sb.WriteString("  \n")
+	sb.WriteString(b.description)
 	return sb.String(), nil
 }
 
