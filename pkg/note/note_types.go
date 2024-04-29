@@ -67,7 +67,6 @@ func (notes) label() string {
 
 func (notes) toMarkdown(content string) (string, error) {
 	note := wordWrap(sentenceCase(content), 80)
-	note = fmt.Sprintln(note)
 	return note, nil
 }
 
@@ -79,6 +78,5 @@ func (todo) label() string {
 
 func (todo) toMarkdown(content string) (string, error) {
 	note := wordWrap(fmt.Sprint("- [ ] ", sentenceCase(content)), 80)
-	note = fmt.Sprintln(note)
 	return note, nil
 }
