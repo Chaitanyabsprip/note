@@ -27,13 +27,9 @@ func (cp ConfigurationParser) ParseArgs() (*Config, error) {
 		fmt.Println(err.Error())
 		return nil, err
 	}
-	rootFlags.Visit(func(f *flag.Flag) {
-		fmt.Println("Flag", f)
-	})
 	config.Content = strings.Join(rootFlags.Args(), " ")
 	if rootFlags.NArg() > 0 {
 		arg := rootFlags.Arg(0)
-		fmt.Println(arg)
 		switch arg {
 		// if peek is the first word of the note then it needs to be quoted with
 		// other strings.
