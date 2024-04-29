@@ -25,6 +25,8 @@ func sentenceCase(input string) string {
 	return strings.TrimSpace(sb.String())
 }
 
+const wrapWidth = 80
+
 func wordWrap(text string, lineWidth int) string {
 	lines := strings.Split(text, "\n")
 	wrapped := ""
