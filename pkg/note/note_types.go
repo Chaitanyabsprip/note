@@ -77,29 +77,47 @@ type issue struct {
 	createdAt   time.Time
 	title       string
 	description string
-	labels      []string
 	status      Status
+	labels      []string
 }
 
-type Status int
+type Status string
 
 const (
-	Open Status = iota + 1
-	Closed
-	InProgress
+	Open       Status = "Open"
+	Closed     Status = "Closed"
+	InProgress Status = "InProgress"
 )
+
+func NewIssue(title, description string, labels []string, createdAt time.Time) *issue {
+	return &issue{
+		createdAt:   createdAt,
+		title:       title,
+		description: description,
+		status:      Open,
+		labels:      labels,
+	}
+}
+
+func (i issue) CreatedAtFormatted() string {
+	if i.createdAt.IsZero() {
+		return ""
+	}
+	return i.createdAt.Format(time.UnixDate)
+}
 
 func (issue) Label() string {
 	return "Issues"
 }
 
-func (i issue) toMarkdown(content string) (string, error) {
-	var sb *strings.Builder
-	fmt.Fprintln(sb, "##", wordWrap(i.title, wrapWidth))
-	fmt.Fprintln(sb, "createdAt:", i.createdAt.Format(time.UnixDate))
-	fmt.Fprintln(sb, "labels:", i.labels)
+func (i issue) ToMarkdown(content string) (string, error) {
+	sb := &strings.Builder{}
+	fmt.Fprint(sb, "## ", wordWrap(i.title, wrapWidth))
+	fmt.Fprintln(sb, "createdAt:", i.CreatedAtFormatted())
+	fmt.Fprintln(sb, "status:", i.status)
+	fmt.Fprintln(sb, "labels:", strings.Join(i.labels, ", "))
 	sb.WriteString("\n")
-	fmt.Fprintln(sb, wordWrap(content, wrapWidth))
+	fmt.Fprint(sb, wordWrap(content, wrapWidth))
 	sb.WriteString("\n")
 	sb.WriteString("### Comments")
 	sb.WriteString("\n")
