@@ -46,18 +46,19 @@ func fetchWebpageTitle(url string) string {
 	if err != nil {
 		return ""
 	}
-	var title string
-	var traverse func(*html.Node)
-	traverse = func(n *html.Node) {
-		if n.Type == html.ElementNode && n.Data == "title" && n.Parent != nil && n.Parent.Data == "head" {
-			title = n.FirstChild.Data
-			return
+	var traverse func(*html.Node) (string, bool)
+	traverse = func(n *html.Node) (string, bool) {
+		if n.Type == html.ElementNode && n.Data == "title" {
+			return n.FirstChild.Data, true
 		}
 		for c := n.FirstChild; c != nil; c = c.NextSibling {
-			traverse(c)
+			if result, ok := traverse(c); ok {
+				return result, ok
+			}
 		}
+		return "", false
 	}
-	traverse(doc)
+	title, _ := traverse(doc)
 	return title
 }
 
@@ -94,25 +95,16 @@ func (issue) Label() string {
 
 func (i issue) toMarkdown(content string) (string, error) {
 	var sb *strings.Builder
-	// ## Issue 1: Issue 1 Title
 	fmt.Fprintln(sb, "##", wordWrap(i.title, wrapWidth))
-	// createdAt:
 	fmt.Fprintln(sb, "createdAt:", i.createdAt.Format(time.UnixDate))
-	// labels:
 	fmt.Fprintln(sb, "labels:", i.labels)
-	//
 	sb.WriteString("\n")
-	// Issue 1 description goes here.
 	fmt.Fprintln(sb, wordWrap(content, wrapWidth))
-	//
 	sb.WriteString("\n")
-	// ### Comments
 	sb.WriteString("### Comments")
-	//
 	sb.WriteString("\n")
-	// ---
 	sb.WriteString("---")
-	return "", nil
+	return sb.String(), nil
 }
 
 type todo struct{}
