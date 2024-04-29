@@ -18,40 +18,83 @@ type ConfigurationParser struct {
 }
 
 func (cp ConfigurationParser) ParseArgs() (*Config, error) {
-	var config *Config
-	var err error
-	root := getopt.NewFlagSet("note", flag.ContinueOnError)
-	config, err = parseRootArgs(root, cp.args)
+	config := new(Config)
+	rootFlags := getopt.NewFlagSet("note", flag.ContinueOnError)
+	registerRootFlags(rootFlags, config)
+	registerNoteTypeFlags(rootFlags, config)
+	err := rootFlags.Parse(cp.args)
 	if err != nil {
+		fmt.Println(err.Error())
 		return nil, err
 	}
-	pArgs := root.Args()
-	if root.NArg() > 0 && pArgs[0] == "peek" {
+	rootFlags.Visit(func(f *flag.Flag) {
+		fmt.Println("Flag", f)
+	})
+	config.Content = strings.Join(rootFlags.Args(), " ")
+	if rootFlags.NArg() > 0 {
+		arg := rootFlags.Arg(0)
+		fmt.Println(arg)
+		switch arg {
 		// if peek is the first word of the note then it needs to be quoted with
 		// other strings.
-		previewCmd := getopt.NewFlagSet("note peek", flag.ContinueOnError)
-		config, err = parsePreviewArgs(previewCmd, root.Args()[1:])
-		if err != nil {
-			return nil, err
+		case "p", "peek":
+			cmd := getopt.NewFlagSet("note peek", flag.ContinueOnError)
+			registerPreviewFlags(cmd, config)
+			err = cmd.Parse(rootFlags.Args()[1:])
+			if err != nil {
+				return nil, err
+			}
+		case "b", "bm", "bookmark":
+			cmd := getopt.NewFlagSet("note bookmark", flag.ContinueOnError)
+			registerRootFlags(cmd, config)
+			err = cmd.Parse(rootFlags.Args()[1:])
+			if err != nil {
+				return nil, err
+			}
+		case "d", "dump":
+			cmd := getopt.NewFlagSet("note bookmark", flag.ContinueOnError)
+			registerRootFlags(cmd, config)
+			err = cmd.Parse(rootFlags.Args()[1:])
+			if err != nil {
+				return nil, err
+			}
+		case "t", "td", "todo":
+			cmd := getopt.NewFlagSet("note bookmark", flag.ContinueOnError)
+			registerRootFlags(cmd, config)
+			err = cmd.Parse(rootFlags.Args()[1:])
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 	cp.determineFilepath(config, cp.getenv)
 	return config, err
 }
 
-func parseRootArgs(flags *getopt.FlagSet, args []string) (*Config, error) {
-	config := new(Config)
-	config.Type = "dump"
-	addHelpFlags(flags)
-	bookmark := flags.Bool("bookmark", false, "Add new bookmark")
+func registerNoteTypeFlags(flags *getopt.FlagSet, config *Config) {
+	flags.BoolVar(&config.IsBookmark, "bookmark", false, "Add new bookmark")
 	flags.Alias("b", "bookmark")
-	dump := flags.Bool("dump", false, "Add new dump")
+	flags.BoolVar(&config.IsDump, "dump", false, "Add new dump")
 	flags.Alias("d", "dump")
-	todo := flags.Bool("todo", false, "Add new todo")
+	flags.BoolVar(&config.IsTodo, "todo", false, "Add new todo")
 	flags.Alias("t", "todo")
-	flags.StringVar(&config.Description, "desc", "", "Add description for bookmarks")
+}
+
+func registerBookmarkFlags(flags *getopt.FlagSet, config *Config) {
+	flags.StringVar(&config.Description, "desc", "", "Description for bookmarks")
 	flags.Alias("D", "desc")
-	flags.Func("tags", "Add tags for bookmarks", func(s string) error {
+	flags.Func("tags", "Comma separated list of tags", func(s string) error {
+		config.Tags = append(config.Tags, strings.Split(s, ",")...)
+		return nil
+	})
+	flags.Alias("T", "tags")
+}
+
+func registerRootFlags(flags *getopt.FlagSet, config *Config) {
+	addHelpFlags(flags)
+	flags.StringVar(&config.Description, "desc", "", "Description for bookmarks")
+	flags.Alias("D", "desc")
+	flags.Func("tags", "Comma separated list of tags", func(s string) error {
 		config.Tags = append(config.Tags, strings.Split(s, ",")...)
 		return nil
 	})
@@ -63,24 +106,15 @@ func parseRootArgs(flags *getopt.FlagSet, args []string) (*Config, error) {
 	flags.Alias("e", "edit")
 	flags.StringVar(&config.Notespath, "file", "", "Specify notes file")
 	flags.Alias("f", "file")
-	err := flags.Parse(args)
-	if err != nil {
-		return nil, err
-	}
-	config.Type = getNoteType(*bookmark, *dump, *todo)
-	config.Content = strings.Join(flags.Args(), " ")
-	return config, nil
 }
 
-func parsePreviewArgs(flags *getopt.FlagSet, args []string) (*Config, error) {
-	config := new(Config)
-	config.Type = "dump"
+func registerPreviewFlags(flags *getopt.FlagSet, config *Config) {
 	addHelpFlags(flags)
-	bookmark := flags.Bool("bookmark", false, "Add new bookmark")
+	flags.BoolVar(&config.IsBookmark, "bookmark", false, "Add new bookmark")
 	flags.Alias("b", "bookmark")
-	dump := flags.Bool("dump", false, "Add new dump")
+	flags.BoolVar(&config.IsDump, "dump", false, "Add new dump")
 	flags.Alias("d", "dump")
-	todo := flags.Bool("todo", false, "Add new todo")
+	flags.BoolVar(&config.IsTodo, "todo", false, "Add new todo")
 	flags.Alias("t", "todo")
 	flags.BoolVar(&config.Global, "g", false, "Use global notes")
 	flags.IntVar(&config.Level, "level", 2, "Level of markdown heading")
@@ -88,27 +122,10 @@ func parsePreviewArgs(flags *getopt.FlagSet, args []string) (*Config, error) {
 	flags.IntVar(&config.NumOfHeadings, "n", 3, "Number of headings to preview")
 	flags.StringVar(&config.Notespath, "file", "", "Specify notes file")
 	flags.Alias("f", "file")
-	err := flags.Parse(args)
-	if err != nil {
-		return nil, err
-	}
-	config.Type = getNoteType(*bookmark, *dump, *todo)
-	return config, err
-}
-
-func getNoteType(bookmark, dump, todo bool) string {
-	if bookmark {
-		return "bookmark"
-	} else if dump {
-		return "dump"
-	} else if todo {
-		return "todo"
-	}
-	return "dump"
 }
 
 func (cp ConfigurationParser) determineFilepath(config *Config, getenv func(string) string) error {
-	defaultFilename := fmt.Sprint("notes.", config.Type, ".md")
+	defaultFilename := fmt.Sprint("notes.", config.NoteType(), ".md")
 	defaultFilepath, err := cp.getDefaultFilepath(defaultFilename)
 	if err != nil {
 		return err
