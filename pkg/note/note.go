@@ -49,9 +49,9 @@ func (n Note) Note() error {
 	if note == nil {
 		return nil
 	}
-	setupFile(n.NotesPath, note.label())
+	setupFile(n.NotesPath, note.Label())
 	maybeOpenEditor(n.EditFile, n.NotesPath, "nvim")
-	markdown, err := note.toMarkdown(n.Content)
+	markdown, err := note.ToMarkdown(n.Content)
 	if err != nil {
 		return err
 	}

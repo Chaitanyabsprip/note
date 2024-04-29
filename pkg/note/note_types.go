@@ -15,8 +15,8 @@ const (
 )
 
 type noteType interface {
-	label() string
-	toMarkdown(string) (string, error)
+	Label() string
+	ToMarkdown(string) (string, error)
 }
 
 type bookmark struct {
@@ -24,11 +24,11 @@ type bookmark struct {
 	tags        []string
 }
 
-func (bookmark) label() string {
+func (bookmark) Label() string {
 	return "Bookmarks"
 }
 
-func (b bookmark) toMarkdown(content string) (string, error) {
+func (b bookmark) ToMarkdown(content string) (string, error) {
 	title := fetchWebpageTitle(content)
 	tags := strings.Join(b.tags, ", ")
 	return fmt.Sprintf("\n[%s](%s)  \ntags: %s  \n%s", title, content, tags, b.description), nil
@@ -61,22 +61,22 @@ func fetchWebpageTitle(url string) string {
 
 type notes struct{}
 
-func (notes) label() string {
+func (notes) Label() string {
 	return "Notes"
 }
 
-func (notes) toMarkdown(content string) (string, error) {
+func (notes) ToMarkdown(content string) (string, error) {
 	note := wordWrap(sentenceCase(content), 80)
 	return note, nil
 }
 
 type todo struct{}
 
-func (todo) label() string {
+func (todo) Label() string {
 	return "Todo"
 }
 
-func (todo) toMarkdown(content string) (string, error) {
+func (todo) ToMarkdown(content string) (string, error) {
 	note := wordWrap(fmt.Sprint("- [ ] ", sentenceCase(content)), 80)
 	return note, nil
 }
