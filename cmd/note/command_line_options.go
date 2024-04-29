@@ -51,6 +51,8 @@ func (cp ConfigurationParser) ParseArgs() (*Config, error) {
 			if err != nil {
 				return nil, err
 			}
+			config.IsBookmark = true
+			config.Content = strings.Join(cmd.Args(), " ")
 		case "d", "dump":
 			cmd := getopt.NewFlagSet("note bookmark", flag.ContinueOnError)
 			registerRootFlags(cmd, config)
@@ -58,6 +60,8 @@ func (cp ConfigurationParser) ParseArgs() (*Config, error) {
 			if err != nil {
 				return nil, err
 			}
+			config.IsDump = true
+			config.Content = strings.Join(cmd.Args(), " ")
 		case "t", "td", "todo":
 			cmd := getopt.NewFlagSet("note bookmark", flag.ContinueOnError)
 			registerRootFlags(cmd, config)
@@ -65,6 +69,8 @@ func (cp ConfigurationParser) ParseArgs() (*Config, error) {
 			if err != nil {
 				return nil, err
 			}
+			config.IsTodo = true
+			config.Content = strings.Join(cmd.Args(), " ")
 		}
 	}
 	cp.determineFilepath(config, cp.getenv)
