@@ -21,7 +21,6 @@ func (cp ConfigurationParser) ParseArgs() (*Config, error) {
 	config := new(Config)
 	rootFlags := getopt.NewFlagSet("note", flag.ContinueOnError)
 	registerRootFlags(rootFlags, config)
-	registerNoteTypeFlags(rootFlags, config)
 	err := rootFlags.Parse(cp.args)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -43,6 +42,7 @@ func (cp ConfigurationParser) ParseArgs() (*Config, error) {
 		case "b", "bm", "bookmark":
 			cmd := getopt.NewFlagSet("note bookmark", flag.ContinueOnError)
 			registerRootFlags(cmd, config)
+			registerBookmarkFlags(cmd, config)
 			err = cmd.Parse(rootFlags.Args()[1:])
 			if err != nil {
 				return nil, err
@@ -73,15 +73,6 @@ func (cp ConfigurationParser) ParseArgs() (*Config, error) {
 	return config, err
 }
 
-func registerNoteTypeFlags(flags *getopt.FlagSet, config *Config) {
-	flags.BoolVar(&config.IsBookmark, "bookmark", false, "Add new bookmark")
-	flags.Alias("b", "bookmark")
-	flags.BoolVar(&config.IsDump, "dump", false, "Add new dump")
-	flags.Alias("d", "dump")
-	flags.BoolVar(&config.IsTodo, "todo", false, "Add new todo")
-	flags.Alias("t", "todo")
-}
-
 func registerBookmarkFlags(flags *getopt.FlagSet, config *Config) {
 	flags.StringVar(&config.Description, "desc", "", "Description for bookmarks")
 	flags.Alias("D", "desc")
@@ -94,13 +85,6 @@ func registerBookmarkFlags(flags *getopt.FlagSet, config *Config) {
 
 func registerRootFlags(flags *getopt.FlagSet, config *Config) {
 	addHelpFlags(flags)
-	flags.StringVar(&config.Description, "desc", "", "Description for bookmarks")
-	flags.Alias("D", "desc")
-	flags.Func("tags", "Comma separated list of tags", func(s string) error {
-		config.Tags = append(config.Tags, strings.Split(s, ",")...)
-		return nil
-	})
-	flags.Alias("T", "tags")
 	flags.BoolVar(&config.Global, "g", false, "Use global notes")
 	flags.BoolVar(&config.Quiet, "quiet", false, "Minimise output")
 	flags.Alias("q", "quiet")
