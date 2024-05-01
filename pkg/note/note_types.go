@@ -78,7 +78,7 @@ type issue struct {
 	title       string
 	description string
 	status      Status
-	labels      []string
+	tags        []string
 }
 
 type Status string
@@ -95,7 +95,7 @@ func NewIssue(title, description string, labels []string, createdAt time.Time) *
 		title:       title,
 		description: description,
 		status:      Open,
-		labels:      labels,
+		tags:        labels,
 	}
 }
 
@@ -115,7 +115,7 @@ func (i issue) toMarkdown(content string) (string, error) {
 	fmt.Fprint(sb, "## ", wordWrap(i.title, wrapWidth))
 	fmt.Fprintln(sb, "createdAt:", i.CreatedAtFormatted())
 	fmt.Fprintln(sb, "status:", i.status)
-	fmt.Fprintln(sb, "labels:", strings.Join(i.labels, ", "))
+	fmt.Fprintln(sb, "labels:", strings.Join(i.tags, ", "))
 	sb.WriteString("\n")
 	fmt.Fprint(sb, wordWrap(content, wrapWidth))
 	sb.WriteString("\n")
