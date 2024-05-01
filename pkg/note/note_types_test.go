@@ -22,7 +22,7 @@ func TestNoteTypeToMarkdown(t *testing.T) {
 		},
 		{
 			name:     "NotesCreation",
-			noteType: &notes{},
+			noteType: new(notes),
 			content:  "This is a test note.",
 			expected: "This is a test note.",
 		},
@@ -34,20 +34,20 @@ func TestNoteTypeToMarkdown(t *testing.T) {
 		},
 		{
 			name:     "TodoCreation",
-			noteType: &todo{},
+			noteType: new(todo),
 			content:  "This is a test todo.",
 			expected: "- [ ] This is a test todo.",
 		},
 		// Edge Cases
 		{
 			name:     "EmptyContent",
-			noteType: &bookmark{},
+			noteType: new(bookmark),
 			content:  "",
 			expected: "[]()  \ntags:",
 		},
 		{
 			name:     "InvalidURL",
-			noteType: &bookmark{},
+			noteType: new(bookmark),
 			content:  "invalid-url",
 			expected: "[](invalid-url)  \ntags:\n",
 		},
@@ -61,7 +61,7 @@ func TestNoteTypeToMarkdown(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			md, err := tc.noteType.ToMarkdown(tc.content)
+			md, err := tc.noteType.toMarkdown(tc.content)
 			if err != nil {
 				t.Errorf("Error converting %s to Markdown: %v", tc.name, err)
 			}

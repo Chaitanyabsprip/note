@@ -17,8 +17,8 @@ const (
 )
 
 type noteType interface {
-	Label() string
-	ToMarkdown(string) (string, error)
+	label() string
+	toMarkdown(string) (string, error)
 }
 
 type bookmark struct {
@@ -26,11 +26,11 @@ type bookmark struct {
 	tags        []string
 }
 
-func (bookmark) Label() string {
+func (bookmark) label() string {
 	return "Bookmarks"
 }
 
-func (b bookmark) ToMarkdown(content string) (string, error) {
+func (b bookmark) toMarkdown(content string) (string, error) {
 	title := fetchWebpageTitle(content)
 	tags := strings.Join(b.tags, ", ")
 	return fmt.Sprintf("\n[%s](%s)  \ntags: %s  \n%s", title, content, tags, b.description), nil
@@ -64,11 +64,11 @@ func fetchWebpageTitle(url string) string {
 
 type notes struct{}
 
-func (notes) Label() string {
+func (notes) label() string {
 	return "Notes"
 }
 
-func (notes) ToMarkdown(content string) (string, error) {
+func (notes) toMarkdown(content string) (string, error) {
 	note := wordWrap(sentenceCase(content), wrapWidth)
 	return note, nil
 }
@@ -106,11 +106,11 @@ func (i issue) CreatedAtFormatted() string {
 	return i.createdAt.Format(time.UnixDate)
 }
 
-func (issue) Label() string {
+func (issue) label() string {
 	return "Issues"
 }
 
-func (i issue) ToMarkdown(content string) (string, error) {
+func (i issue) toMarkdown(content string) (string, error) {
 	sb := &strings.Builder{}
 	fmt.Fprint(sb, "## ", wordWrap(i.title, wrapWidth))
 	fmt.Fprintln(sb, "createdAt:", i.CreatedAtFormatted())
@@ -127,11 +127,11 @@ func (i issue) ToMarkdown(content string) (string, error) {
 
 type todo struct{}
 
-func (todo) Label() string {
+func (todo) label() string {
 	return "Todo"
 }
 
-func (todo) ToMarkdown(content string) (string, error) {
+func (todo) toMarkdown(content string) (string, error) {
 	note := wordWrap(fmt.Sprint("- [ ] ", sentenceCase(content)), wrapWidth)
 	return note, nil
 }
