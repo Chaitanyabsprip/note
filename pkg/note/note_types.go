@@ -89,9 +89,9 @@ const (
 	InProgress Status = "InProgress"
 )
 
-func NewIssue(title, description string, labels []string, createdAt time.Time) *issue {
+func NewIssue(title, description string, labels []string, now time.Time) *issue {
 	return &issue{
-		createdAt:   createdAt,
+		createdAt:   now,
 		title:       title,
 		description: description,
 		status:      Open,
@@ -112,7 +112,7 @@ func (issue) label() string {
 
 func (i issue) toMarkdown(content string) (string, error) {
 	sb := &strings.Builder{}
-	fmt.Fprint(sb, "## ", wordWrap(i.title, wrapWidth))
+	fmt.Fprintln(sb, "##", wordWrap(i.title, wrapWidth))
 	fmt.Fprintln(sb, "createdAt:", i.CreatedAtFormatted())
 	fmt.Fprintln(sb, "status:", i.status)
 	fmt.Fprintln(sb, "labels:", strings.Join(i.tags, ", "))
