@@ -11,6 +11,7 @@ type Config struct {
 	Content       string
 	Description   string
 	Notespath     string
+	Project       string
 	Title         string
 	Tags          []string
 	Level         int

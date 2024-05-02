@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -8,13 +9,16 @@ import (
 	"strings"
 
 	"rsc.io/getopt"
+
+	"github.com/chaitanyabsprip/note/pkg/project"
 )
 
 type ConfigurationParser struct {
-	exit   func(int)
-	getenv func(string) string
-	getwd  func() (string, error)
-	args   []string
+	exit              func(int)
+	getenv            func(string) string
+	getwd             func() (string, error)
+	projectRepository *project.ProjectRepository
+	args              []string
 }
 
 func (cp ConfigurationParser) ParseArgs() (*Config, error) {
@@ -30,8 +34,8 @@ func (cp ConfigurationParser) ParseArgs() (*Config, error) {
 	if rootFlags.NArg() > 0 {
 		arg := rootFlags.Arg(0)
 		switch arg {
-		// if peek is the first word of the note then it needs to be quoted with
-		// other strings.
+		// if any subcommand is the first word of the note then it needs to be
+		// quoted with other strings.
 		case "p", "peek":
 			cmd := getopt.NewFlagSet("note peek", flag.ContinueOnError)
 			registerPreviewFlags(cmd, config)
@@ -112,6 +116,8 @@ func registerRootFlags(flags *getopt.FlagSet, config *Config) {
 	flags.Alias("e", "edit")
 	flags.StringVar(&config.Notespath, "file", "", "Specify notes file")
 	flags.Alias("f", "file")
+	flags.StringVar(&config.Project, "project", "", "Specify notes file")
+	flags.Alias("p", "project")
 }
 
 func registerPreviewFlags(flags *getopt.FlagSet, config *Config) {
@@ -143,6 +149,21 @@ func (cp ConfigurationParser) determineFilepath(config *Config, getenv func(stri
 	}
 	if config.Global {
 		config.Notespath = filepath.Join(getenv("NOTESPATH"), defaultFilename)
+	}
+	if config.Project != "" {
+		project := cp.projectRepository.GetProject(config.Project)
+		if project == nil {
+			return errors.New("could not find the project")
+		}
+		config.Notespath = filepath.Join(project.Path, defaultFilename)
+		return nil
+	}
+	name := filepath.Base(filepath.Dir(config.Notespath))
+	fmt.Println(config.Notespath)
+	_, err = cp.projectRepository.AddProject(name, filepath.Dir(config.Notespath), "")
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
 	}
 	return nil
 }

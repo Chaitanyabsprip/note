@@ -7,9 +7,11 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"path/filepath"
 
 	"github.com/chaitanyabsprip/note/pkg/note"
 	"github.com/chaitanyabsprip/note/pkg/preview"
+	"github.com/chaitanyabsprip/note/pkg/project"
 )
 
 func main() {
@@ -28,11 +30,20 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 		log.Fatal("Invalid Usage")
 		os.Exit(1)
 	}
+	cachefile, err := getConfigFilepath()
+	if err != nil {
+		return 0, err
+	}
+	pr, err := project.NewProjectRepository(cachefile)
+	if err != nil {
+		return 0, err
+	}
 	cp := ConfigurationParser{
-		exit:   os.Exit,
-		getenv: getenv,
-		getwd:  os.Getwd,
-		args:   args[1:],
+		exit:              os.Exit,
+		getenv:            getenv,
+		getwd:             os.Getwd,
+		args:              args[1:],
+		projectRepository: pr,
 	}
 	config, err := cp.ParseArgs()
 	if err != nil {
@@ -66,4 +77,19 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 		return 1, err
 	}
 	return 0, nil
+}
+
+func getConfigFilepath() (string, error) {
+	configDir, err := os.UserCacheDir()
+	if err != nil {
+		return "", err
+	}
+	noteDir := filepath.Join(configDir, "note")
+	if _, err := os.Stat(noteDir); os.IsNotExist(err) {
+		if err := os.Mkdir(noteDir, 0o755); err != nil {
+			return "", err
+		}
+	}
+	configFile := filepath.Join(noteDir, "projects.json")
+	return configFile, nil
 }
