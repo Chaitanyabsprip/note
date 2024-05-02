@@ -42,7 +42,7 @@ func New(content, description, notesPath, title, _type string, tags []string, ed
 }
 
 func (n Note) validate() error {
-	if n.Content == "" && !n.EditFile {
+	if n.Content == "" && !n.EditFile && n.Type != Issue {
 		return errors.New("nothing to note here")
 	}
 	return nil
