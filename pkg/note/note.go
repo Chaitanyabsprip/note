@@ -64,7 +64,7 @@ func (n Note) Note() error {
 		return err
 	}
 	defer file.Close()
-	if note.label() != "Issue" {
+	if note.label() != "Issues" {
 		markdown, err = addHeading(markdown, file)
 		if err != nil {
 			return err
