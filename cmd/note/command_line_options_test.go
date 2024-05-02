@@ -130,6 +130,26 @@ var (
 			[]string{"-ef", tAltNotespath},
 			withDefaults(Config{IsDump: true, Notespath: tAltNotespath, EditFile: true}),
 		},
+		{
+			"i should create a new issue with default Title as 'Issue'",
+			[]string{"i"},
+			withDefaults(Config{IsIssue: true, Notespath: getFilepath(note.Issue), Title: "Issue"}),
+		},
+		{
+			"passing -t with string should set title",
+			[]string{"i", "-t", "This is a new issue"},
+			withDefaults(Config{IsIssue: true, Notespath: getFilepath(note.Issue), Title: "This is a new issue"}),
+		},
+		{
+			"positional strings should be concatenated and set as Content",
+			[]string{"i", "-t", "This is a new issue", "This is the description of the issue"},
+			withDefaults(Config{
+				IsIssue:   true,
+				Notespath: getFilepath(note.Issue),
+				Title:     "This is a new issue",
+				Content:   "This is the description of the issue",
+			}),
+		},
 	}
 )
 

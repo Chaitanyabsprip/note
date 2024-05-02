@@ -7,21 +7,24 @@ import (
 	"os/exec"
 	path "path/filepath"
 	"strings"
+	"time"
 
 	"github.com/chaitanyabsprip/note/pkg/preview"
 )
 
 type Note struct {
+	Status      Status
 	Content     string
 	Description string
 	NotesPath   string
+	Title       string
 	Type        string
 	Tags        []string
 	EditFile    bool
 	HidePreview bool
 }
 
-func New(content, description, notesPath, _type string, tags []string, editFile, showPreview bool) (Note, error) {
+func New(content, description, notesPath, title, _type string, tags []string, editFile, showPreview bool) (Note, error) {
 	n := new(Note)
 	n.Content = content
 	n.Description = description
@@ -30,6 +33,7 @@ func New(content, description, notesPath, _type string, tags []string, editFile,
 	n.NotesPath = notesPath
 	n.Tags = tags
 	n.Type = _type
+	n.Title = title
 	err := n.validate()
 	if err != nil {
 		return Note{}, err
@@ -60,9 +64,11 @@ func (n Note) Note() error {
 		return err
 	}
 	defer file.Close()
-	markdown, err = addHeading(markdown, file)
-	if err != nil {
-		return err
+	if note.label() != "Issue" {
+		markdown, err = addHeading(markdown, file)
+		if err != nil {
+			return err
+		}
 	}
 	_, err = file.WriteString(markdown)
 	if err != nil {
@@ -86,6 +92,8 @@ func (n Note) getNoteType() noteType {
 		note = notes{}
 	case Todo:
 		note = todo{}
+	case Issue:
+		note = NewIssue(n.Title, n.Description, n.Tags, time.Now())
 	default:
 		fmt.Fprintln(os.Stdout, "nothing to do")
 		return nil

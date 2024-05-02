@@ -48,6 +48,7 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 			config.Content,
 			config.Description,
 			config.Notespath,
+			config.Title,
 			config.NoteType(),
 			config.Tags,
 			config.EditFile,

@@ -67,10 +67,30 @@ func (cp ConfigurationParser) ParseArgs() (*Config, error) {
 			}
 			config.IsTodo = true
 			config.Content = strings.Join(cmd.Args(), " ")
+		case "i", "issue":
+			cmd := getopt.NewFlagSet("note issue", flag.ContinueOnError)
+			registerRootFlags(cmd, config)
+			registerIssueFlags(cmd, config)
+			err = cmd.Parse(rootFlags.Args()[1:])
+			if err != nil {
+				return nil, err
+			}
+			config.IsIssue = true
+			config.Content = strings.Join(cmd.Args(), " ")
 		}
 	}
 	cp.determineFilepath(config, cp.getenv)
 	return config, err
+}
+
+func registerIssueFlags(flags *getopt.FlagSet, config *Config) {
+	flags.StringVar(&config.Title, "title", "Issue", "Title for the issue")
+	flags.Alias("t", "title")
+	flags.Func("tags", "Comma separated list of tags", func(s string) error {
+		config.Tags = append(config.Tags, strings.Split(s, ",")...)
+		return nil
+	})
+	flags.Alias("T", "tags")
 }
 
 func registerBookmarkFlags(flags *getopt.FlagSet, config *Config) {
@@ -102,6 +122,8 @@ func registerPreviewFlags(flags *getopt.FlagSet, config *Config) {
 	flags.Alias("d", "dump")
 	flags.BoolVar(&config.IsTodo, "todo", false, "Add new todo")
 	flags.Alias("t", "todo")
+	flags.BoolVar(&config.IsIssue, "issue", false, "Add new issue")
+	flags.Alias("i", "issue")
 	flags.BoolVar(&config.Global, "g", false, "Use global notes")
 	flags.IntVar(&config.Level, "level", 2, "Level of markdown heading")
 	flags.Alias("l", "level")
