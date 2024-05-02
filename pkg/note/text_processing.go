@@ -17,7 +17,6 @@ func sentenceCase(input string) string {
 		if len(sentence) == 0 {
 			continue
 		}
-		sentence = strings.ToLower(sentence)
 		sb.WriteString(strings.ToUpper(string(sentence[0])))
 		sb.WriteString(sentence[1:])
 		sb.WriteString("\n")

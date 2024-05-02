@@ -112,7 +112,7 @@ func (issue) label() string {
 
 func (i issue) toMarkdown(content string) (string, error) {
 	sb := &strings.Builder{}
-	fmt.Fprintln(sb, "##", wordWrap(i.title, wrapWidth))
+	fmt.Fprintln(sb, "##", wordWrap(sentenceCase(i.title), wrapWidth))
 	fmt.Fprintln(sb, "createdAt:", i.CreatedAtFormatted())
 	fmt.Fprintln(sb, "status:", i.status)
 	fmt.Fprintln(sb, "labels:", strings.Join(i.tags, ", "))
