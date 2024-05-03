@@ -6,17 +6,23 @@ import (
 	"testing"
 
 	"github.com/chaitanyabsprip/note/pkg/note"
+	"github.com/chaitanyabsprip/note/pkg/project"
 )
 
 func TestFlagParser(t *testing.T) {
 	for _, tC := range parseArgsTestCases {
 		t.Run(tC.desc, func(t *testing.T) {
+			pr, err := project.NewProjectRepository("")
+			if err != nil {
+				return
+			}
 			cp := ConfigurationParser{
 				exit: func(int) {},
 				getwd: func() (string, error) {
 					return tNotespath, nil
 				},
-				args: tC.args,
+				args:              tC.args,
+				projectRepository: pr,
 			}
 			config, err := cp.ParseArgs()
 			if err != nil {
