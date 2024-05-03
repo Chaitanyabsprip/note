@@ -12,10 +12,9 @@ func TestFlagParser(t *testing.T) {
 	for _, tC := range parseArgsTestCases {
 		t.Run(tC.desc, func(t *testing.T) {
 			cp := ConfigurationParser{
-				exit:   func(int) {},
-				getenv: tGetenv,
+				exit: func(int) {},
 				getwd: func() (string, error) {
-					return tGetenv(""), nil
+					return tNotespath, nil
 				},
 				args: tC.args,
 			}
@@ -40,11 +39,6 @@ var (
 		args   []string
 		config Config
 	}{
-		{
-			"-g flag should configure Global: true",
-			[]string{"-g"},
-			withDefaults(Config{Global: true, Notespath: getFilepath(note.Dump)}),
-		},
 		{
 			"-e flag should configure EditFile: true",
 			[]string{"-e"},
@@ -76,26 +70,6 @@ var (
 			withDefaults(Config{IsDump: true, Notespath: getFilepath(note.Dump), Quiet: true}),
 		},
 		{
-			"-ge flag should configure Global: true, EditFile: true",
-			[]string{"-ge"},
-			withDefaults(Config{IsDump: true, Notespath: getFilepath(note.Dump), Global: true, EditFile: true}),
-		},
-		{
-			"t -g flag should configure Mode: todo, Global: true",
-			[]string{"t", "-g"},
-			withDefaults(Config{IsTodo: true, Notespath: getFilepath(note.Todo), Global: true}),
-		},
-		{
-			"b -g flag should configure Mode: bookmark, Global: true",
-			[]string{"b", "-g"},
-			withDefaults(Config{IsBookmark: true, Notespath: getFilepath(note.Bookmark), Global: true}),
-		},
-		{
-			"d -g flag should configure Mode: dump, Global: true",
-			[]string{"d", "-g"},
-			withDefaults(Config{IsDump: true, Notespath: getFilepath(note.Dump), Global: true}),
-		},
-		{
 			"t -e flag should configure Mode: todo, EditFile: true",
 			[]string{"t", "-e"},
 			withDefaults(Config{IsTodo: true, Notespath: getFilepath(note.Todo), EditFile: true}),
@@ -109,21 +83,6 @@ var (
 			"d -e flag should configure Mode: dump, EditFile: true",
 			[]string{"d", "-e"},
 			withDefaults(Config{IsDump: true, Notespath: getFilepath(note.Dump), EditFile: true}),
-		},
-		{
-			"t -ge flag should configure Mode: todo, Global: true, EditFile: true",
-			[]string{"t", "-ge"},
-			withDefaults(Config{IsTodo: true, Notespath: getFilepath(note.Todo), EditFile: true, Global: true}),
-		},
-		{
-			"b -ge flag should configure Mode: bookmark, Global: true, EditFile: true",
-			[]string{"b", "-ge"},
-			withDefaults(Config{IsBookmark: true, Notespath: getFilepath(note.Bookmark), EditFile: true, Global: true}),
-		},
-		{
-			"d -ge flag should configure Mode: dump, Global: true, EditFile: true",
-			[]string{"d", "-ge"},
-			withDefaults(Config{IsDump: true, Notespath: getFilepath(note.Dump), EditFile: true, Global: true}),
 		},
 		{
 			"-ef <path> flag should configure Mode: dump, Global: true, EditFile: true",
@@ -152,10 +111,6 @@ var (
 		},
 	}
 )
-
-func tGetenv(_ string) string {
-	return tNotespath
-}
 
 func withDefaults(config Config) Config {
 	updatedConfig := config

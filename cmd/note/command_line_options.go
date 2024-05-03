@@ -15,7 +15,6 @@ import (
 
 type ConfigurationParser struct {
 	exit              func(int)
-	getenv            func(string) string
 	getwd             func() (string, error)
 	projectRepository *project.ProjectRepository
 	args              []string
@@ -83,7 +82,7 @@ func (cp ConfigurationParser) ParseArgs() (*Config, error) {
 			config.Content = strings.Join(cmd.Args(), " ")
 		}
 	}
-	cp.determineFilepath(config, cp.getenv)
+	cp.determineFilepath(config)
 	return config, err
 }
 
@@ -109,7 +108,6 @@ func registerBookmarkFlags(flags *getopt.FlagSet, config *Config) {
 
 func registerRootFlags(flags *getopt.FlagSet, config *Config) {
 	addHelpFlags(flags)
-	flags.BoolVar(&config.Global, "g", false, "Use global notes")
 	flags.BoolVar(&config.Quiet, "quiet", false, "Minimise output")
 	flags.Alias("q", "quiet")
 	flags.BoolVar(&config.EditFile, "edit", false, "Open file with $EDITOR")
@@ -130,7 +128,6 @@ func registerPreviewFlags(flags *getopt.FlagSet, config *Config) {
 	flags.Alias("t", "todo")
 	flags.BoolVar(&config.IsIssue, "issue", false, "Add new issue")
 	flags.Alias("i", "issue")
-	flags.BoolVar(&config.Global, "g", false, "Use global notes")
 	flags.IntVar(&config.Level, "level", 2, "Level of markdown heading")
 	flags.Alias("l", "level")
 	flags.IntVar(&config.NumOfHeadings, "n", 3, "Number of headings to preview")
@@ -140,7 +137,7 @@ func registerPreviewFlags(flags *getopt.FlagSet, config *Config) {
 	flags.Alias("p", "project")
 }
 
-func (cp ConfigurationParser) determineFilepath(config *Config, getenv func(string) string) error {
+func (cp ConfigurationParser) determineFilepath(config *Config) error {
 	defaultFilename := fmt.Sprint("notes.", config.NoteType(), ".md")
 	defaultFilepath, err := cp.getDefaultFilepath(defaultFilename)
 	if err != nil {
@@ -148,9 +145,6 @@ func (cp ConfigurationParser) determineFilepath(config *Config, getenv func(stri
 	}
 	if config.Notespath == "" {
 		config.Notespath = defaultFilepath
-	}
-	if config.Global {
-		config.Notespath = filepath.Join(getenv("NOTESPATH"), defaultFilename)
 	}
 	if repoRoot := project.GetRepositoryRoot(filepath.Dir(config.Notespath)); repoRoot != "" {
 		config.Notespath = repoRoot

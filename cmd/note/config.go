@@ -17,7 +17,6 @@ type Config struct {
 	Level         int
 	NumOfHeadings int
 	EditFile      bool
-	Global        bool
 	IsBookmark    bool
 	IsDump        bool
 	IsIssue       bool
@@ -42,7 +41,6 @@ func (c Config) Equals(other Config) bool {
 	return c.Content == other.Content &&
 		c.Description == other.Description &&
 		c.EditFile == other.EditFile &&
-		c.Global == other.Global &&
 		c.Level == other.Level &&
 		c.NoteType() == other.NoteType() &&
 		c.Notespath == other.Notespath &&

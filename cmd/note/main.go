@@ -15,14 +15,14 @@ import (
 )
 
 func main() {
-	exitCode, err := run(context.Background(), os.Args, os.Stdout, os.Getenv)
+	exitCode, err := run(context.Background(), os.Args, os.Stdout)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(exitCode)
 	}
 }
 
-func run(ctx context.Context, args []string, w io.Writer, getenv func(string) string) (int, error) {
+func run(ctx context.Context, args []string, w io.Writer) (int, error) {
 	_, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 	// parse configuration
@@ -40,7 +40,6 @@ func run(ctx context.Context, args []string, w io.Writer, getenv func(string) st
 	}
 	cp := ConfigurationParser{
 		exit:              os.Exit,
-		getenv:            getenv,
 		getwd:             os.Getwd,
 		args:              args[1:],
 		projectRepository: pr,
