@@ -136,6 +136,8 @@ func registerPreviewFlags(flags *getopt.FlagSet, config *Config) {
 	flags.IntVar(&config.NumOfHeadings, "n", 3, "Number of headings to preview")
 	flags.StringVar(&config.Notespath, "file", "", "Specify notes file")
 	flags.Alias("f", "file")
+	flags.StringVar(&config.Project, "project", "", "Specify notes file")
+	flags.Alias("p", "project")
 }
 
 func (cp ConfigurationParser) determineFilepath(config *Config, getenv func(string) string) error {
