@@ -152,6 +152,9 @@ func (cp ConfigurationParser) determineFilepath(config *Config, getenv func(stri
 	if config.Global {
 		config.Notespath = filepath.Join(getenv("NOTESPATH"), defaultFilename)
 	}
+	if repoRoot := project.GetRepositoryRoot(filepath.Dir(config.Notespath)); repoRoot != "" {
+		config.Notespath = repoRoot
+	}
 	if config.Project != "" {
 		project := cp.projectRepository.GetProject(config.Project)
 		if project == nil {
@@ -161,10 +164,7 @@ func (cp ConfigurationParser) determineFilepath(config *Config, getenv func(stri
 		return nil
 	}
 	name := filepath.Base(filepath.Dir(config.Notespath))
-	fmt.Println(config.Notespath)
-	_, err = cp.projectRepository.AddProject(name, filepath.Dir(config.Notespath), "")
-	if err != nil {
-		fmt.Println(err.Error())
+	if _, err = cp.projectRepository.AddProject(name, filepath.Dir(config.Notespath), ""); err != nil {
 		return err
 	}
 	return nil

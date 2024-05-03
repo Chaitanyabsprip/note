@@ -91,6 +91,7 @@ func GetRepositoryRoot(dirpath string) string {
 	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
 	var out bytes.Buffer
 	cmd.Stdout = &out
+	cmd.Dir = dirpath
 	err := cmd.Run()
 	if err != nil {
 		return ""
