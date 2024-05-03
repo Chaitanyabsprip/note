@@ -33,7 +33,11 @@ func (bookmark) label() string {
 func (b bookmark) toMarkdown(content string) (string, error) {
 	title := fetchWebpageTitle(content)
 	tags := strings.Join(b.tags, ", ")
-	return fmt.Sprintf("\n[%s](%s)  \ntags: %s  \n%s", title, content, tags, b.description), nil
+	tagsLine := "tags:"
+	if tags != "" {
+		tagsLine = fmt.Sprintf("tags: %s  \n", tags)
+	}
+	return fmt.Sprintf("\n[%s](%s)  \n%s%s", title, content, tagsLine, b.description), nil
 }
 
 func fetchWebpageTitle(url string) string {
