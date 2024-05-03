@@ -147,7 +147,7 @@ func (cp ConfigurationParser) determineFilepath(config *Config) error {
 		config.Notespath = defaultFilepath
 	}
 	if repoRoot := project.GetRepositoryRoot(filepath.Dir(config.Notespath)); repoRoot != "" {
-		config.Notespath = repoRoot
+		config.Notespath = filepath.Join(repoRoot, defaultFilename)
 	}
 	if config.Project != "" {
 		project := cp.projectRepository.GetProject(config.Project)
