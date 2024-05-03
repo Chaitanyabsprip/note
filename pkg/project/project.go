@@ -6,6 +6,7 @@ import (
 	"errors"
 	"os"
 	"os/exec"
+	"strings"
 	"sync"
 )
 
@@ -96,7 +97,7 @@ func GetRepositoryRoot(dirpath string) string {
 	if err != nil {
 		return ""
 	}
-	return out.String()
+	return strings.ReplaceAll(out.String(), "\n", "")
 }
 
 func (pr *ProjectRepository) loadProjects() error {
