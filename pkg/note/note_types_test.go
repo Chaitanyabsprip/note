@@ -38,7 +38,7 @@ func TestNoteTypeToMarkdown(t *testing.T) {
 				time.Date(2022, time.January, 1, 0, 0, 0, 0, time.UTC),
 			),
 			content:  "This is a test issue.",
-			expected: "## Test Issue\n\ncreatedAt: Sat Jan  1 00:00:00 UTC 2022\nstatus: Open\nlabels: bug, enhancement\n\nThis is a test issue.\n\n### Comments\n---",
+			expected: "## Test Issue\n\ncreatedAt: Sat Jan  1 00:00:00 UTC 2022\nstatus: Open\nlabels: bug, enhancement\n\nThis is a test issue.\n\n### Comments\n\n---",
 		},
 		{
 			name:     "TodoCreation",
@@ -68,7 +68,7 @@ func TestNoteTypeToMarkdown(t *testing.T) {
 				time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC),
 			),
 			content:  "This is a test issue.",
-			expected: "## \n\ncreatedAt: \nstatus: Open\nlabels: \n\nThis is a test issue.\n\n### Comments\n---",
+			expected: "## \n\ncreatedAt: \nstatus: Open\nlabels: \n\nThis is a test issue.\n\n### Comments\n\n---",
 		},
 	}
 
