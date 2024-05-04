@@ -12,6 +12,7 @@ import (
 	"rsc.io/getopt"
 
 	"github.com/chaitanyabsprip/note/cmd/note/config"
+	"github.com/chaitanyabsprip/note/cmd/note/views"
 	"github.com/chaitanyabsprip/note/pkg/project"
 )
 
@@ -83,7 +84,15 @@ func (cp ConfigurationParser) ParseArgs() (*config.Config, error) {
 				return nil, err
 			}
 			config.IsIssue = true
-			config.Content = strings.Join(cmd.Args(), " ")
+			if rootFlags.NArg() == 1 {
+				config, err = views.GetIssueConfiguration()
+				if err != nil {
+					return nil, err
+				}
+				fmt.Printf("%+v\n", config)
+			} else {
+				config.Content = strings.Join(cmd.Args(), " ")
+			}
 		}
 	}
 	cp.determineFilepath(config)
