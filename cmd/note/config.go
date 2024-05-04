@@ -6,6 +6,7 @@ import (
 	"github.com/chaitanyabsprip/note/pkg/note"
 )
 
+// Config struct  
 type Config struct {
 	Status        note.Status
 	Content       string
@@ -24,6 +25,7 @@ type Config struct {
 	Quiet         bool
 }
 
+// NoteType method  
 func (c Config) NoteType() string {
 	if c.IsBookmark {
 		return note.Bookmark
@@ -37,6 +39,7 @@ func (c Config) NoteType() string {
 	return "dump"
 }
 
+// Equals method  
 func (c Config) Equals(other Config) bool {
 	return c.Content == other.Content &&
 		c.Description == other.Description &&

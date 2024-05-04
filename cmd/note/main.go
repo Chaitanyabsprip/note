@@ -28,7 +28,6 @@ func run(ctx context.Context, args []string, w io.Writer) (int, error) {
 	// parse configuration
 	if len(args) < 2 {
 		log.Fatal("Invalid Usage")
-		os.Exit(1)
 	}
 	cachefile, err := getConfigFilepath()
 	if err != nil {
@@ -50,7 +49,13 @@ func run(ctx context.Context, args []string, w io.Writer) (int, error) {
 	}
 	// call application
 	if args[1] == "peek" || args[1] == "p" {
-		p := preview.New(w, config.NoteType(), config.Notespath, config.NumOfHeadings, config.Level)
+		p := preview.New(
+			w,
+			config.NoteType(),
+			config.Notespath,
+			config.NumOfHeadings,
+			config.Level,
+		)
 		err = p.Peek()
 	} else {
 		var n note.Note

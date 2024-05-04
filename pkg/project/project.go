@@ -1,3 +1,4 @@
+// Package project provides project  
 package project
 
 import (
@@ -10,6 +11,7 @@ import (
 	"sync"
 )
 
+// Project struct  
 type Project struct {
 	Name string `json:"name"`
 	Path string `json:"path"`
@@ -17,14 +19,16 @@ type Project struct {
 	ID   int    `json:"id"`
 }
 
-type ProjectRepository struct {
+// Repository struct  
+type Repository struct {
 	configPath string
 	projects   []*Project
 	mu         sync.Mutex
 }
 
-func NewProjectRepository(configPath string) (*ProjectRepository, error) {
-	pr := &ProjectRepository{configPath: configPath}
+// NewProjectRepository function  
+func NewProjectRepository(configPath string) (*Repository, error) {
+	pr := &Repository{configPath: configPath}
 	err := pr.loadProjects()
 	if err != nil {
 		return nil, err
@@ -32,7 +36,8 @@ func NewProjectRepository(configPath string) (*ProjectRepository, error) {
 	return pr, nil
 }
 
-func (pr *ProjectRepository) GetProject(name string) *Project {
+// GetProject method  
+func (pr *Repository) GetProject(name string) *Project {
 	for _, project := range pr.projects {
 		if project.Name == name {
 			return project
@@ -41,7 +46,10 @@ func (pr *ProjectRepository) GetProject(name string) *Project {
 	return nil
 }
 
-func (pr *ProjectRepository) AddProject(name, path, url string) (*Project, error) {
+// AddProject method  
+func (pr *Repository) AddProject(
+	name, path, url string,
+) (*Project, error) {
 	pr.mu.Lock()
 	defer pr.mu.Unlock()
 	for _, p := range pr.projects {
@@ -70,7 +78,11 @@ func (pr *ProjectRepository) AddProject(name, path, url string) (*Project, error
 	return project, nil
 }
 
-func (pr *ProjectRepository) UpdateProject(id int, name, path, url string) (*Project, error) {
+// UpdateProject method  
+func (pr *Repository) UpdateProject(
+	id int,
+	name, path, url string,
+) (*Project, error) {
 	pr.mu.Lock()
 	defer pr.mu.Unlock()
 	for _, p := range pr.projects {
@@ -88,6 +100,7 @@ func (pr *ProjectRepository) UpdateProject(id int, name, path, url string) (*Pro
 	return nil, errors.New("project not found")
 }
 
+// GetRepositoryRoot uses git CLI to find the root of the repository.
 func GetRepositoryRoot(dirpath string) string {
 	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
 	var out bytes.Buffer
@@ -100,7 +113,7 @@ func GetRepositoryRoot(dirpath string) string {
 	return strings.ReplaceAll(out.String(), "\n", "")
 }
 
-func (pr *ProjectRepository) loadProjects() error {
+func (pr *Repository) loadProjects() error {
 	if _, err := os.Stat(pr.configPath); os.IsNotExist(err) {
 		err = os.WriteFile(pr.configPath, []byte("[]"), 0o644)
 		if err != nil {
@@ -120,7 +133,7 @@ func (pr *ProjectRepository) loadProjects() error {
 	return nil
 }
 
-func (pr *ProjectRepository) saveProjects() error {
+func (pr *Repository) saveProjects() error {
 	data, err := json.MarshalIndent(pr.projects, "", "  ")
 	if err != nil {
 		return err

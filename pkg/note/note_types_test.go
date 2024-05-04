@@ -15,8 +15,11 @@ func TestNoteTypeToMarkdown(t *testing.T) {
 	}{
 		// Normal Cases
 		{
-			name:     "BookmarkCreation",
-			noteType: &bookmark{description: "Bookmark description", tags: []string{"tag1", "tag2"}},
+			name: "BookmarkCreation",
+			noteType: &bookmark{
+				description: "Bookmark description",
+				tags:        []string{"tag1", "tag2"},
+			},
 			content:  "https://example.com",
 			expected: "[Example Domain](https://example.com)  \ntags: tag1, tag2  \nBookmark description",
 		},
@@ -27,8 +30,13 @@ func TestNoteTypeToMarkdown(t *testing.T) {
 			expected: "This is a test note.",
 		},
 		{
-			name:     "IssueCreation",
-			noteType: NewIssue("Test Issue", "This is a test issue description.", []string{"bug", "enhancement"}, time.Date(2022, time.January, 1, 0, 0, 0, 0, time.UTC)),
+			name: "IssueCreation",
+			noteType: newIssue(
+				"Test Issue",
+				"This is a test issue description.",
+				[]string{"bug", "enhancement"},
+				time.Date(2022, time.January, 1, 0, 0, 0, 0, time.UTC),
+			),
 			content:  "This is a test issue.",
 			expected: "## Test Issue\n\ncreatedAt: Sat Jan  1 00:00:00 UTC 2022\nstatus: Open\nlabels: bug, enhancement\n\nThis is a test issue.\n\n### Comments\n---",
 		},
@@ -52,8 +60,13 @@ func TestNoteTypeToMarkdown(t *testing.T) {
 			expected: "[](invalid-url)  \ntags:\n",
 		},
 		{
-			name:     "EmptyLabels",
-			noteType: NewIssue("", "", []string{}, time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC)),
+			name: "EmptyLabels",
+			noteType: newIssue(
+				"",
+				"",
+				[]string{},
+				time.Date(1, time.January, 1, 0, 0, 0, 0, time.UTC),
+			),
 			content:  "This is a test issue.",
 			expected: "## \n\ncreatedAt: \nstatus: Open\nlabels: \n\nThis is a test issue.\n\n### Comments\n---",
 		},
@@ -66,7 +79,12 @@ func TestNoteTypeToMarkdown(t *testing.T) {
 				t.Errorf("Error converting %s to Markdown: %v", tc.name, err)
 			}
 			if strings.TrimSpace(md) != strings.TrimSpace(tc.expected) {
-				t.Errorf("%s Markdown does not match expected. Got: %s, Expected: %s", tc.name, md, tc.expected)
+				t.Errorf(
+					"%s Markdown does not match expected. Got: %s, Expected: %s",
+					tc.name,
+					md,
+					tc.expected,
+				)
 			}
 		})
 	}

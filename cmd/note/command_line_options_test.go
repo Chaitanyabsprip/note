@@ -83,7 +83,9 @@ var (
 		{
 			"b -e flag should configure Mode: bookmark, Editfile: true",
 			[]string{"b", "-e"},
-			withDefaults(Config{IsBookmark: true, Notespath: getFilepath(note.Bookmark), EditFile: true}),
+			withDefaults(
+				Config{IsBookmark: true, Notespath: getFilepath(note.Bookmark), EditFile: true},
+			),
 		},
 		{
 			"d -e flag should configure Mode: dump, EditFile: true",
@@ -91,7 +93,7 @@ var (
 			withDefaults(Config{IsDump: true, Notespath: getFilepath(note.Dump), EditFile: true}),
 		},
 		{
-			"-ef <path> flag should configure Mode: dump, Global: true, EditFile: true",
+			"-ef <path> flag should configure Mode: dump, EditFile: true",
 			[]string{"-ef", tAltNotespath},
 			withDefaults(Config{IsDump: true, Notespath: tAltNotespath, EditFile: true}),
 		},
@@ -103,7 +105,13 @@ var (
 		{
 			"passing -t with string should set title",
 			[]string{"i", "-t", "This is a new issue"},
-			withDefaults(Config{IsIssue: true, Notespath: getFilepath(note.Issue), Title: "This is a new issue"}),
+			withDefaults(
+				Config{
+					IsIssue:   true,
+					Notespath: getFilepath(note.Issue),
+					Title:     "This is a new issue",
+				},
+			),
 		},
 		{
 			"positional strings should be concatenated and set as Content",

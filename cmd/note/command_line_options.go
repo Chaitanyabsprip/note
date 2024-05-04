@@ -1,3 +1,4 @@
+// Package main provides main  
 package main
 
 import (
@@ -13,13 +14,15 @@ import (
 	"github.com/chaitanyabsprip/note/pkg/project"
 )
 
+// ConfigurationParser struct  
 type ConfigurationParser struct {
 	exit              func(int)
 	getwd             func() (string, error)
-	projectRepository *project.ProjectRepository
+	projectRepository *project.Repository
 	args              []string
 }
 
+// ParseArgs method  
 func (cp ConfigurationParser) ParseArgs() (*Config, error) {
 	config := new(Config)
 	rootFlags := getopt.NewFlagSet("note", flag.ContinueOnError)
@@ -97,7 +100,12 @@ func registerIssueFlags(flags *getopt.FlagSet, config *Config) {
 }
 
 func registerBookmarkFlags(flags *getopt.FlagSet, config *Config) {
-	flags.StringVar(&config.Description, "desc", "", "Description for bookmarks")
+	flags.StringVar(
+		&config.Description,
+		"desc",
+		"",
+		"Description for bookmarks",
+	)
 	flags.Alias("D", "desc")
 	flags.Func("tags", "Comma separated list of tags", func(s string) error {
 		config.Tags = append(config.Tags, strings.Split(s, ",")...)
@@ -175,7 +183,9 @@ func addHelpFlags(flags *getopt.FlagSet) {
 	flags.Alias("h", "help")
 }
 
-func (cp ConfigurationParser) getDefaultFilepath(filename string) (string, error) {
+func (cp ConfigurationParser) getDefaultFilepath(
+	filename string,
+) (string, error) {
 	dir, err := cp.getwd()
 	if err != nil {
 		return "", err

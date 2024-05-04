@@ -1,3 +1,4 @@
+// Package preview provides preview  
 package preview
 
 import (
@@ -9,8 +10,10 @@ import (
 	"github.com/charmbracelet/glamour"
 )
 
+// BUFSIZE  
 const BUFSIZE int64 = 256
 
+// Preview struct  
 type Preview struct {
 	out           io.Writer
 	Type          string
@@ -19,6 +22,7 @@ type Preview struct {
 	Level         int
 }
 
+// New function  
 func New(
 	w io.Writer,
 	_type string,
@@ -35,6 +39,7 @@ func New(
 	return p
 }
 
+// Peek method  
 func (p *Preview) Peek() error {
 	file, err := os.Open(p.NotesPath)
 	if err != nil {
@@ -45,10 +50,14 @@ func (p *Preview) Peek() error {
 	if err != nil {
 		return err
 	}
-	Render(p.out, content)
+	err = Render(p.out, content)
+	if err != nil {
+		return err
+	}
 	return nil
 }
 
+// GetHeadings function  
 func GetHeadings(file *os.File, numOfHeadings int, level int) (string, error) {
 	fileInfo, err := file.Stat()
 	if err != nil {
@@ -58,7 +67,7 @@ func GetHeadings(file *os.File, numOfHeadings int, level int) (string, error) {
 	filesize := fileInfo.Size()
 	heading := strings.Repeat("#", level)
 	sep := fmt.Sprintf("\n%s ", heading)
-	var prevOffset int64 = 0
+	var prevOffset int64
 	offset := BUFSIZE
 	count := 0
 	out := ""
@@ -72,7 +81,14 @@ func GetHeadings(file *os.File, numOfHeadings int, level int) (string, error) {
 		}
 		if bytesRead > 0 {
 			readString := string(readBuffer[:min(filesize, offset)-prevOffset])
-			count, out, overflow = parsePartialHeadings(readString, sep, out, overflow, count, numOfHeadings)
+			count, out, overflow = parsePartialHeadings(
+				readString,
+				sep,
+				out,
+				overflow,
+				count,
+				numOfHeadings,
+			)
 			if count == numOfHeadings {
 				return out, nil
 			}
@@ -83,7 +99,11 @@ func GetHeadings(file *os.File, numOfHeadings int, level int) (string, error) {
 	return out, nil
 }
 
-func readBefore(file io.ReadSeeker, offset int64, readBuffer []byte) (int, error) {
+func readBefore(
+	file io.ReadSeeker,
+	offset int64,
+	readBuffer []byte,
+) (int, error) {
 	_, err := file.Seek(-offset, io.SeekEnd)
 	if err != nil {
 		return 0, err
@@ -124,6 +144,7 @@ func splitAfterN(s, sep string, n int) string {
 	return split[len(split)-1]
 }
 
+// Render function  
 func Render(w io.Writer, in string) error {
 	renderer, err := glamour.NewTermRenderer(
 		glamour.WithStylePath(glamour.DarkStyle),

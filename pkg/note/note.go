@@ -1,3 +1,4 @@
+// Package note provides note  
 package note
 
 import (
@@ -12,6 +13,7 @@ import (
 	"github.com/chaitanyabsprip/note/pkg/preview"
 )
 
+// Note struct  
 type Note struct {
 	Status      Status
 	Content     string
@@ -24,7 +26,12 @@ type Note struct {
 	HidePreview bool
 }
 
-func New(content, description, notesPath, title, _type string, tags []string, editFile, showPreview bool) (Note, error) {
+// New function  
+func New(
+	content, description, notesPath, title, _type string,
+	tags []string,
+	editFile, showPreview bool,
+) (Note, error) {
 	n := new(Note)
 	n.Content = content
 	n.Description = description
@@ -48,6 +55,7 @@ func (n Note) validate() error {
 	return nil
 }
 
+// Note method  
 func (n Note) Note() error {
 	note := n.getNoteType()
 	if note == nil {
@@ -93,7 +101,7 @@ func (n Note) getNoteType() noteType {
 	case Todo:
 		note = todo{}
 	case Issue:
-		note = NewIssue(n.Title, n.Description, n.Tags, time.Now())
+		note = newIssue(n.Title, n.Description, n.Tags, time.Now())
 	default:
 		fmt.Fprintln(os.Stdout, "nothing to do")
 		return nil

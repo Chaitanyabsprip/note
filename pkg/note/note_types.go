@@ -10,10 +10,14 @@ import (
 )
 
 const (
+	// Bookmark  
 	Bookmark = "bookmark"
-	Dump     = "dump"
-	Issue    = "issue"
-	Todo     = "todo"
+	// Dump  
+	Dump = "dump"
+	// Issue  
+	Issue = "issue"
+	// Todo  
+	Todo = "todo"
 )
 
 type noteType interface {
@@ -37,7 +41,13 @@ func (b bookmark) toMarkdown(content string) (string, error) {
 	if tags != "" {
 		tagsLine = fmt.Sprintf("tags: %s  \n", tags)
 	}
-	return fmt.Sprintf("\n[%s](%s)  \n%s%s", title, content, tagsLine, b.description), nil
+	return fmt.Sprintf(
+		"\n[%s](%s)  \n%s%s",
+		title,
+		content,
+		tagsLine,
+		b.description,
+	), nil
 }
 
 func fetchWebpageTitle(url string) string {
@@ -85,15 +95,24 @@ type issue struct {
 	tags        []string
 }
 
+// Status  
 type Status string
 
 const (
-	Open       Status = "Open"
-	Closed     Status = "Closed"
+	// Open  
+	Open Status = "Open"
+	// Closed  
+	Closed Status = "Closed"
+	// InProgress  
 	InProgress Status = "InProgress"
 )
 
-func NewIssue(title, description string, labels []string, now time.Time) *issue {
+// newIssue function  
+func newIssue(
+	title, description string,
+	labels []string,
+	now time.Time,
+) *issue {
 	return &issue{
 		createdAt:   now,
 		title:       title,
