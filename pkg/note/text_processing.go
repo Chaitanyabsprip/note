@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/chaitanyabsprip/note/pkg/preview"
+	"github.com/muesli/reflow/wordwrap"
 )
 
 func sentenceCase(input string) string {
@@ -27,28 +28,29 @@ func sentenceCase(input string) string {
 const wrapWidth = 80
 
 func wordWrap(text string, lineWidth int) string {
-	lines := strings.Split(text, "\n")
-	wrapped := ""
-	for _, line := range lines {
-		words := strings.Fields(strings.TrimSpace(line))
-		if len(words) == 0 {
-			wrapped += line + "\n"
-			continue
-		}
-		currLine := words[0]
-		for _, word := range words[1:] {
-			if len(currLine)+len(word) <= lineWidth-3 {
-				currLine += " " + word
-			} else {
-				wrapped += currLine + "\n"
-				currLine = word
-			}
-		}
-		if currLine != "" {
-			wrapped += currLine + "\n"
-		}
-	}
-	return wrapped
+	return wordwrap.String(text, lineWidth)
+	// lines := strings.Split(text, "\n")
+	// wrapped := ""
+	// for _, line := range lines {
+	// 	words := strings.Fields(strings.TrimSpace(line))
+	// 	if len(words) == 0 {
+	// 		wrapped += line + "\n"
+	// 		continue
+	// 	}
+	// 	currLine := words[0]
+	// 	for _, word := range words[1:] {
+	// 		if len(currLine)+len(word) <= lineWidth-3 {
+	// 			currLine += " " + word
+	// 		} else {
+	// 			wrapped += currLine + "\n"
+	// 			currLine = word
+	// 		}
+	// 	}
+	// 	if currLine != "" {
+	// 		wrapped += currLine + "\n"
+	// 	}
+	// }
+	// return wrapped
 }
 
 func addHeading(body string, file *os.File) (string, error) {
