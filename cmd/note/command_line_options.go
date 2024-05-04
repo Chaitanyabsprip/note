@@ -11,6 +11,7 @@ import (
 
 	"rsc.io/getopt"
 
+	"github.com/chaitanyabsprip/note/cmd/note/config"
 	"github.com/chaitanyabsprip/note/pkg/project"
 )
 
@@ -23,8 +24,8 @@ type ConfigurationParser struct {
 }
 
 // ParseArgs method  
-func (cp ConfigurationParser) ParseArgs() (*Config, error) {
-	config := new(Config)
+func (cp ConfigurationParser) ParseArgs() (*config.Config, error) {
+	config := new(config.Config)
 	rootFlags := getopt.NewFlagSet("note", flag.ContinueOnError)
 	registerRootFlags(rootFlags, config)
 	err := rootFlags.Parse(cp.args)
@@ -89,7 +90,7 @@ func (cp ConfigurationParser) ParseArgs() (*Config, error) {
 	return config, err
 }
 
-func registerIssueFlags(flags *getopt.FlagSet, config *Config) {
+func registerIssueFlags(flags *getopt.FlagSet, config *config.Config) {
 	flags.StringVar(&config.Title, "title", "Issue", "Title for the issue")
 	flags.Alias("t", "title")
 	flags.Func("tags", "Comma separated list of tags", func(s string) error {
@@ -99,7 +100,7 @@ func registerIssueFlags(flags *getopt.FlagSet, config *Config) {
 	flags.Alias("T", "tags")
 }
 
-func registerBookmarkFlags(flags *getopt.FlagSet, config *Config) {
+func registerBookmarkFlags(flags *getopt.FlagSet, config *config.Config) {
 	flags.StringVar(
 		&config.Description,
 		"desc",
@@ -114,7 +115,7 @@ func registerBookmarkFlags(flags *getopt.FlagSet, config *Config) {
 	flags.Alias("T", "tags")
 }
 
-func registerRootFlags(flags *getopt.FlagSet, config *Config) {
+func registerRootFlags(flags *getopt.FlagSet, config *config.Config) {
 	addHelpFlags(flags)
 	flags.BoolVar(&config.Quiet, "quiet", false, "Minimise output")
 	flags.Alias("q", "quiet")
@@ -126,7 +127,7 @@ func registerRootFlags(flags *getopt.FlagSet, config *Config) {
 	flags.Alias("p", "project")
 }
 
-func registerPreviewFlags(flags *getopt.FlagSet, config *Config) {
+func registerPreviewFlags(flags *getopt.FlagSet, config *config.Config) {
 	addHelpFlags(flags)
 	flags.BoolVar(&config.IsBookmark, "bookmark", false, "Add new bookmark")
 	flags.Alias("b", "bookmark")
@@ -145,7 +146,7 @@ func registerPreviewFlags(flags *getopt.FlagSet, config *Config) {
 	flags.Alias("p", "project")
 }
 
-func (cp ConfigurationParser) determineFilepath(config *Config) error {
+func (cp ConfigurationParser) determineFilepath(config *config.Config) error {
 	defaultFilename := fmt.Sprint("notes.", config.NoteType(), ".md")
 	defaultFilepath, err := cp.getDefaultFilepath(defaultFilename)
 	if err != nil {
@@ -183,9 +184,7 @@ func addHelpFlags(flags *getopt.FlagSet) {
 	flags.Alias("h", "help")
 }
 
-func (cp ConfigurationParser) getDefaultFilepath(
-	filename string,
-) (string, error) {
+func (cp ConfigurationParser) getDefaultFilepath(filename string) (string, error) {
 	dir, err := cp.getwd()
 	if err != nil {
 		return "", err

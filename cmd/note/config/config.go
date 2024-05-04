@@ -1,4 +1,5 @@
-package main
+// Package config provides config
+package config
 
 import (
 	"slices"

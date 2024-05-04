@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/chaitanyabsprip/note/cmd/note/config"
 	"github.com/chaitanyabsprip/note/pkg/note"
 	"github.com/chaitanyabsprip/note/pkg/project"
 )
@@ -43,70 +44,82 @@ var (
 	parseArgsTestCases = []struct {
 		desc   string
 		args   []string
-		config Config
+		config config.Config
 	}{
 		{
 			"-e flag should configure EditFile: true",
 			[]string{"-e"},
-			withDefaults(Config{EditFile: true, Notespath: getFilepath(note.Dump)}),
+			withDefaults(config.Config{EditFile: true, Notespath: getFilepath(note.Dump)}),
 		},
 		{
 			"-f <path> flag should configure Mode: dump",
 			[]string{"-f", tAltNotespath},
-			withDefaults(Config{IsDump: true, Notespath: tAltNotespath}),
+			withDefaults(config.Config{IsDump: true, Notespath: tAltNotespath}),
 		},
 		{
 			"t flag should configure Mode: todo",
 			[]string{"t"},
-			withDefaults(Config{IsTodo: true, Notespath: getFilepath(note.Todo)}),
+			withDefaults(config.Config{IsTodo: true, Notespath: getFilepath(note.Todo)}),
 		},
 		{
 			"b flag should configure Mode: bookmark",
 			[]string{"b"},
-			withDefaults(Config{IsBookmark: true, Notespath: getFilepath(note.Bookmark)}),
+			withDefaults(config.Config{IsBookmark: true, Notespath: getFilepath(note.Bookmark)}),
 		},
 		{
 			"d flag should configure Mode: dump",
 			[]string{"d"},
-			withDefaults(Config{IsDump: true, Notespath: getFilepath(note.Dump)}),
+			withDefaults(config.Config{IsDump: true, Notespath: getFilepath(note.Dump)}),
 		},
 		{
 			"-q flag should configure Quiet: true",
 			[]string{"-q"},
-			withDefaults(Config{IsDump: true, Notespath: getFilepath(note.Dump), Quiet: true}),
+			withDefaults(
+				config.Config{IsDump: true, Notespath: getFilepath(note.Dump), Quiet: true},
+			),
 		},
 		{
 			"t -e flag should configure Mode: todo, EditFile: true",
 			[]string{"t", "-e"},
-			withDefaults(Config{IsTodo: true, Notespath: getFilepath(note.Todo), EditFile: true}),
+			withDefaults(
+				config.Config{IsTodo: true, Notespath: getFilepath(note.Todo), EditFile: true},
+			),
 		},
 		{
 			"b -e flag should configure Mode: bookmark, Editfile: true",
 			[]string{"b", "-e"},
 			withDefaults(
-				Config{IsBookmark: true, Notespath: getFilepath(note.Bookmark), EditFile: true},
+				config.Config{
+					IsBookmark: true,
+					Notespath:  getFilepath(note.Bookmark),
+					EditFile:   true,
+				},
 			),
 		},
 		{
 			"d -e flag should configure Mode: dump, EditFile: true",
 			[]string{"d", "-e"},
-			withDefaults(Config{IsDump: true, Notespath: getFilepath(note.Dump), EditFile: true}),
+			withDefaults(
+				config.Config{IsDump: true, Notespath: getFilepath(note.Dump), EditFile: true},
+			),
 		},
 		{
 			"-ef <path> flag should configure Mode: dump, EditFile: true",
 			[]string{"-ef", tAltNotespath},
-			withDefaults(Config{IsDump: true, Notespath: tAltNotespath, EditFile: true}),
+			withDefaults(config.Config{IsDump: true, Notespath: tAltNotespath, EditFile: true}),
 		},
 		{
 			"i should create a new issue with default Title as 'Issue'",
 			[]string{"i"},
-			withDefaults(Config{IsIssue: true, Notespath: getFilepath(note.Issue), Title: "Issue"}),
+			withDefaults(
+				config.Config{IsIssue: true, Notespath: getFilepath(note.Issue), Title: "Issue"},
+			),
 		},
 		{
 			"passing -t with string should set title",
 			[]string{"i", "-t", "This is a new issue"},
 			withDefaults(
-				Config{
+				config.Config{
 					IsIssue:   true,
 					Notespath: getFilepath(note.Issue),
 					Title:     "This is a new issue",
@@ -116,7 +129,7 @@ var (
 		{
 			"positional strings should be concatenated and set as Content",
 			[]string{"i", "-t", "This is a new issue", "This is the description of the issue"},
-			withDefaults(Config{
+			withDefaults(config.Config{
 				IsIssue:   true,
 				Notespath: getFilepath(note.Issue),
 				Title:     "This is a new issue",
@@ -126,7 +139,7 @@ var (
 	}
 )
 
-func withDefaults(config Config) Config {
+func withDefaults(config config.Config) config.Config {
 	updatedConfig := config
 	if updatedConfig.Notespath == "" {
 		updatedConfig.Notespath = tNotespath
