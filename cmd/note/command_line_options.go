@@ -89,7 +89,6 @@ func (cp ConfigurationParser) ParseArgs() (*config.Config, error) {
 				if err != nil {
 					return nil, err
 				}
-				fmt.Printf("%+v\n", config)
 			} else {
 				config.Content = strings.Join(cmd.Args(), " ")
 			}
