@@ -56,7 +56,14 @@ func (cp ConfigurationParser) ParseArgs() (*config.Config, error) {
 				return nil, err
 			}
 			config.IsBookmark = true
-			config.Content = strings.Join(cmd.Args(), " ")
+			if rootFlags.NArg() == 1 {
+				config, err = views.GetBookmarkConfiguration()
+				if err != nil {
+					return nil, err
+				}
+			} else {
+				config.Content = strings.Join(cmd.Args(), " ")
+			}
 		case "d", "dump":
 			cmd := getopt.NewFlagSet("note bookmark", flag.ContinueOnError)
 			registerRootFlags(cmd, config)

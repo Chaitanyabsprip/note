@@ -8,10 +8,8 @@ import (
 
 // ThemeRosepine function  
 func ThemeRosepine() *huh.Theme {
-	t := copyTheme(*huh.ThemeCatppuccin())
-
 	var (
-		// base    = lipgloss.AdaptiveColor{Light: "#fafafa", Dark: "#0f111A"}
+		base = lipgloss.AdaptiveColor{Light: "#fafafa", Dark: "#0f111A"}
 		// surface = lipgloss.AdaptiveColor{Light: "#fffaf3", Dark: "#1f1d2e"}
 		overlay = lipgloss.AdaptiveColor{Light: "#f2e9e1", Dark: "#26233a"}
 		// muted   = lipgloss.AdaptiveColor{Light: "#9893a5", Dark: "#6e6a86"}
@@ -27,7 +25,8 @@ func ThemeRosepine() *huh.Theme {
 		highlightMed  = lipgloss.AdaptiveColor{Light: "#dfdad9", Dark: "#403d52"}
 		highlightHigh = lipgloss.AdaptiveColor{Light: "#cecacd", Dark: "#524f67"}
 	)
-
+	t := copyTheme(*huh.ThemeCatppuccin())
+	t.FieldSeparator = lipgloss.NewStyle().SetString("\n")
 	f := &t.Focused
 	f.Base.BorderForeground(highlightMed).BorderStyle(lipgloss.OuterHalfBlockBorder())
 	f.Title.Foreground(iris).Bold(true)
@@ -49,6 +48,10 @@ func ThemeRosepine() *huh.Theme {
 	f.BlurredButton.Foreground(text).Background(highlightLow)
 	f.Next = f.FocusedButton.Copy()
 
+	f.TextInput.Text = f.TextInput.Text.Copy().
+		BorderBottom(true).
+		BorderForeground(highlightLow).
+		Background(base)
 	f.TextInput.Cursor.Foreground(highlightHigh)
 	f.TextInput.Placeholder.Foreground(highlightLow)
 	f.TextInput.Prompt.Foreground(highlightMed)
