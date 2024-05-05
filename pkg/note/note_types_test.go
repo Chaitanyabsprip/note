@@ -57,7 +57,7 @@ func TestNoteTypeToMarkdown(t *testing.T) {
 			name:     "InvalidURL",
 			noteType: new(bookmark),
 			content:  "invalid-url",
-			expected: "[](invalid-url)  \ntags:\n",
+			expected: "[invalid-url](invalid-url)  \ntags:\n",
 		},
 		{
 			name: "EmptyLabels",

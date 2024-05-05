@@ -36,6 +36,9 @@ func (bookmark) label() string {
 
 func (b bookmark) toMarkdown(content string) (string, error) {
 	title := fetchWebpageTitle(content)
+	if title == "" {
+		title = content
+	}
 	tags := strings.Join(b.tags, ", ")
 	tagsLine := "tags:"
 	if tags != "" {
