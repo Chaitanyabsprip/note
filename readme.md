@@ -17,8 +17,10 @@ habit of creating notes for different projects their working on.
 
 ## Installation
 
-1. Clone the repository
-2. Make sure you have `go` and `make` installed
+1. Clone the repository.
+2. Make sure you have `go` and `make` installed.
+3. Make sure you have `$GOPATH/bin` in your path.
+4. Run `make install` in the root of the repository.
 
 ## Usage
 
