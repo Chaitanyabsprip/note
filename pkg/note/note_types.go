@@ -86,7 +86,7 @@ func (notes) label() string {
 }
 
 func (notes) toMarkdown(content string) (string, error) {
-	note := wordWrap(sentenceCase(content), wrapWidth)
+	note := fmt.Sprintln(wordWrap(sentenceCase(content), wrapWidth))
 	return note, nil
 }
 
