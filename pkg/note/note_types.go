@@ -159,6 +159,6 @@ func (todo) label() string {
 }
 
 func (todo) toMarkdown(content string) (string, error) {
-	note := wordWrap(fmt.Sprint("- [ ] ", sentenceCase(content)), wrapWidth)
+	note := fmt.Sprintln(wordWrap(fmt.Sprint("- [ ] ", sentenceCase(content)), wrapWidth))
 	return note, nil
 }
