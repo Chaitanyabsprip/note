@@ -144,3 +144,8 @@ func (pr *Repository) saveProjects() error {
 	}
 	return nil
 }
+
+// AlreadyExists function  
+func AlreadyExists(err error) bool {
+	return err.Error() == "project with same name already exists"
+}
