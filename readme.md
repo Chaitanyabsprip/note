@@ -1,6 +1,6 @@
-# Draft
+# Note
 
-Draft is, yet another, note-taking tool. It's built with the idea of
+Note is, yet another, note-taking tool. It's built with the idea of
 organization of notes in mind. It specifically caters to people who are in the
 habit of creating notes for different projects their working on.
 
@@ -27,41 +27,41 @@ habit of creating notes for different projects their working on.
 - Taking simple notes
 
 ```sh
-draft This is a new note, You do not even need to use quotes. Unless, \
+note This is a new note, You do not even need to use quotes. Unless, \
   ofcourse, I am using a special character like '?' or "'" or '"'.
 ```
 
-- Making link bookmarks
+- Bookmarking links
 
 ```sh
-draft bookmark https://github.com/Chaitanyabsprip/draft
+note bookmark https://github.com/Chaitanyabsprip/note
 
 # You can also use short forms of subcommands
-draft b https://github.com/Chaitanyabsprip/draft
+note b https://github.com/Chaitanyabsprip/note
 
 # bookmark also has a TUI form option. You can invoke it with the following
 # command
-draft b
+note b
 ```
 
 - Making to-do lists
 
 ```sh
-draft todo I need to get this done
+note todo I need to get this done
 
 # And of course, with the short forms
-draft td I need to get this done
-draft t I need to get this done
+note td I need to get this done
+note t I need to get this done
 ```
 
 - Local issues
 
 ```sh
-draft issue --title "The title of the issue needs to be quoted" However the \
+note issue --title "The title of the issue needs to be quoted" However the \
   description of the issue does not need to be. This is amazing\!
 
 # And again, the short forms
-draft i # this will invoke the TUI form.
+note i # this will invoke the TUI form.
 ```
 
 You can invoke the `-h` flag for the main program or any subcommand to know its
