@@ -42,11 +42,8 @@ func createRootCmd(c *config.Config, cp *CommandTree) *cobra.Command {
 		Long:    "",
 		Example: "",
 		Version: "v0.1.0",
+		Args:    cobra.ArbitraryArgs,
 		RunE:    cp.newNote(c),
-		Args: func(_ *cobra.Command, args []string) error {
-			c.Content = strings.Join(args, " ")
-			return nil
-		},
 	}
 	flags := rootCmd.PersistentFlags()
 	flags.StringVarP(&c.Notespath, "file", "f", "", "Specify notes file")
@@ -64,20 +61,19 @@ func createBookmarkCmd(c *config.Config, cp *CommandTree, rootCmd *cobra.Command
 		Long:    "",
 		Example: "",
 		Aliases: []string{"bm", "b"},
-		Args: func(_ *cobra.Command, args []string) error {
-			c.Content = strings.Join(args, " ")
-			return nil
-		},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		PreRunE: func(_ *cobra.Command, args []string) error {
 			var err error
+			fmt.Println(args)
+			c.IsBookmark = true
 			if len(args) == 0 {
 				c, err = views.GetBookmarkConfiguration()
 				if err != nil {
 					return err
 				}
 			}
-			return cp.newNote(c)(cmd, args)
+			return nil
 		},
+		RunE: cp.newNote(c),
 	}
 	flags := bookmarkCmd.Flags()
 	rootCmd.AddCommand(bookmarkCmd)
@@ -94,11 +90,9 @@ func createDumpCmd(c *config.Config, cp *CommandTree, rootCmd *cobra.Command) {
 		Long:    "",
 		Example: "",
 		Aliases: []string{"d"},
+		Args:    cobra.ArbitraryArgs,
+		PreRun:  func(_ *cobra.Command, _ []string) { c.IsDump = true },
 		RunE:    cp.newNote(c),
-		Args: func(_ *cobra.Command, args []string) error {
-			c.Content = strings.Join(args, " ")
-			return nil
-		},
 	}
 	flags := dumpCmd.Flags()
 	rootCmd.AddCommand(dumpCmd)
@@ -113,9 +107,10 @@ func createTodoCmd(c *config.Config, cp *CommandTree, rootCmd *cobra.Command) {
 		Long:    "",
 		Example: "",
 		Aliases: []string{"td", "t"},
+		PreRun:  func(_ *cobra.Command, _ []string) { c.IsTodo = true },
 		RunE:    cp.newNote(c),
-		Args: func(_ *cobra.Command, args []string) error {
-			c.Content = strings.Join(args, " ")
+		Args: func(_ *cobra.Command, _ []string) error {
+			// c.Content = strings.Join(args, " ")
 			return nil
 		},
 	}
@@ -132,20 +127,19 @@ func createIssueCmd(c *config.Config, cp *CommandTree, rootCmd *cobra.Command) {
 		Long:    "",
 		Example: "",
 		Aliases: []string{"i"},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		Args:    cobra.ArbitraryArgs,
+		PreRunE: func(_ *cobra.Command, args []string) error {
 			var err error
+			c.IsIssue = true
 			if len(args) == 0 {
 				c, err = views.GetIssueConfiguration()
 				if err != nil {
 					return err
 				}
 			}
-			return cp.newNote(c)(cmd, args)
-		},
-		Args: func(_ *cobra.Command, args []string) error {
-			c.Content = strings.Join(args, " ")
 			return nil
 		},
+		RunE: cp.newNote(c),
 	}
 	flags := issueCmd.Flags()
 	rootCmd.AddCommand(issueCmd)
@@ -175,23 +169,23 @@ func createPeekCmd(c *config.Config, cp *CommandTree, rootCmd *cobra.Command) {
 	}
 	flags := peekCmd.Flags()
 	rootCmd.AddCommand(peekCmd)
-	flags.BoolVarP(&c.IsBookmark, "bookmark", "b", false, "Add new bookmark")
-	flags.BoolVarP(&c.IsDump, "dump", "d", false, "Add new dump")
-	flags.BoolVarP(&c.IsTodo, "todo", "t", false, "Add new todo")
-	flags.BoolVarP(&c.IsIssue, "issue", "i", false, "Add new issue")
+	flags.BoolVarP(&c.IsBookmark, "bookmark", "b", false, "Preview bookmarks")
+	flags.BoolVarP(&c.IsDump, "dump", "d", false, "Preview notes")
+	flags.BoolVarP(&c.IsTodo, "todo", "t", false, "Preview todos")
+	flags.BoolVarP(&c.IsIssue, "issue", "i", false, "Preview issues")
 	flags.IntVarP(&c.Level, "level", "l", 2, "Level of markdown heading")
 	flags.IntVar(&c.NumOfHeadings, "n", 3, "Number of headings to preview")
 }
 
 func (cp *CommandTree) newNote(c *config.Config) func(_ *cobra.Command, args []string) error {
-	err := cp.determineFilepath(c)
-	if err != nil {
-		return nil
-	}
 	return func(_ *cobra.Command, args []string) error {
+		err := cp.determineFilepath(c)
+		if err != nil {
+			return nil
+		}
 		c.Content = strings.Join(args, " ")
 		var n note.Note
-		n, err := note.New(
+		n, err = note.New(
 			c.Content,
 			c.Description,
 			c.Notespath,
