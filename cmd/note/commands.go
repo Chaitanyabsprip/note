@@ -17,6 +17,8 @@ import (
 	"github.com/chaitanyabsprip/note/pkg/project"
 )
 
+const version = "v0.1.0"
+
 // CommandTree struct  
 type CommandTree struct {
 	w                 io.Writer
@@ -41,7 +43,7 @@ func createRootCmd(c *config.Config, cp *CommandTree) *cobra.Command {
 		Short:   "Make notes, todos, bookmarks, issues, right from your home.",
 		Long:    "",
 		Example: "",
-		Version: "v0.1.0",
+		Version: version,
 		Args:    cobra.ArbitraryArgs,
 		RunE:    cp.newNote(c),
 	}
