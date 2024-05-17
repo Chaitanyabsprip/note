@@ -46,7 +46,7 @@ func (b bookmark) toMarkdown(content string) (string, error) {
 	}
 	return fmt.Sprintf(
 		"\n[%s](%s)  \n%s%s",
-		title,
+		strings.TrimSpace(title),
 		content,
 		tagsLine,
 		b.description,
