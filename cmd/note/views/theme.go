@@ -25,7 +25,7 @@ func ThemeRosepine() *huh.Theme {
 		highlightMed  = lipgloss.AdaptiveColor{Light: "#dfdad9", Dark: "#403d52"}
 		highlightHigh = lipgloss.AdaptiveColor{Light: "#cecacd", Dark: "#524f67"}
 	)
-	t := copyTheme(*huh.ThemeCatppuccin())
+	t := copyTheme(*huh.ThemeBase())
 	t.FieldSeparator = lipgloss.NewStyle().SetString("\n")
 	f := &t.Focused
 	f.Base.BorderForeground(highlightMed).BorderStyle(lipgloss.OuterHalfBlockBorder())
