@@ -33,23 +33,20 @@ func ThemeRosepine() *huh.Theme {
 	f.NoteTitle.Foreground(rose).Bold(true)
 	f.Description.Foreground(subtle)
 	f.ErrorIndicator.Foreground(love)
-	f.ErrorMessage = f.ErrorMessage.Copy().SetString(" ").Foreground(love)
+	f.ErrorMessage = f.ErrorMessage.SetString(" ").Foreground(love)
 	f.Option.Foreground(text)
-	f.SelectSelector = f.SelectSelector.Copy().
-		Foreground(pine).
-		SetString("▍ ")
+	f.SelectSelector = f.SelectSelector.Foreground(pine).SetString("▍ ")
 	f.Option.Foreground(text)
-	f.MultiSelectSelector = f.MultiSelectSelector.Copy().Foreground(pine).SetString("▍ ")
-	f.SelectedPrefix = f.SelectedPrefix.Copy().Foreground(foam).SetString(" ")
+	f.MultiSelectSelector = f.MultiSelectSelector.Foreground(pine).SetString("▍ ")
+	f.SelectedPrefix = f.SelectedPrefix.Foreground(foam).SetString(" ")
 	f.SelectedOption.Foreground(foam)
-	f.UnselectedPrefix = f.UnselectedPrefix.Copy().Foreground(highlightMed).SetString(" ")
+	f.UnselectedPrefix = f.UnselectedPrefix.Foreground(highlightMed).SetString(" ")
 	f.UnselectedOption.Foreground(text)
 	f.FocusedButton.Foreground(text).Background(pine)
 	f.BlurredButton.Foreground(text).Background(highlightLow)
-	f.Next = f.FocusedButton.Copy()
+	f.Next = f.FocusedButton
 
-	f.TextInput.Text = f.TextInput.Text.Copy().
-		BorderBottom(true).
+	f.TextInput.Text = f.TextInput.Text.BorderBottom(true).
 		BorderForeground(highlightLow).
 		Background(base)
 	f.TextInput.Cursor.Foreground(highlightHigh)
@@ -59,7 +56,7 @@ func ThemeRosepine() *huh.Theme {
 	t.Blurred = copyFieldStyle(*f)
 	t.Blurred.Base.BorderStyle(lipgloss.HiddenBorder()).
 		Background(lipgloss.NoColor{})
-	t.Blurred.MultiSelectSelector = t.Blurred.MultiSelectSelector.Copy().SetString("  ")
+	t.Blurred.MultiSelectSelector = t.Blurred.MultiSelectSelector.SetString("  ")
 	t.Help.Ellipsis.Foreground(overlay)
 	t.Help.ShortKey.Foreground(highlightHigh)
 	t.Help.ShortDesc.Foreground(highlightMed)
@@ -73,51 +70,51 @@ func ThemeRosepine() *huh.Theme {
 
 func copyTheme(t huh.Theme) huh.Theme {
 	return huh.Theme{
-		Form:           t.Form.Copy(),
-		Group:          t.Group.Copy(),
-		FieldSeparator: t.FieldSeparator.Copy(),
+		Form:           t.Form,
+		Group:          t.Group,
+		FieldSeparator: t.FieldSeparator,
 		Blurred:        copyFieldStyle(t.Blurred),
 		Focused:        copyFieldStyle(t.Focused),
 		Help: help.Styles{
-			Ellipsis:       t.Help.Ellipsis.Copy(),
-			ShortKey:       t.Help.ShortKey.Copy(),
-			ShortDesc:      t.Help.ShortDesc.Copy(),
-			ShortSeparator: t.Help.ShortSeparator.Copy(),
-			FullKey:        t.Help.FullKey.Copy(),
-			FullDesc:       t.Help.FullDesc.Copy(),
-			FullSeparator:  t.Help.FullSeparator.Copy(),
+			Ellipsis:       t.Help.Ellipsis,
+			ShortKey:       t.Help.ShortKey,
+			ShortDesc:      t.Help.ShortDesc,
+			ShortSeparator: t.Help.ShortSeparator,
+			FullKey:        t.Help.FullKey,
+			FullDesc:       t.Help.FullDesc,
+			FullSeparator:  t.Help.FullSeparator,
 		},
 	}
 }
 
 func copyFieldStyle(f huh.FieldStyles) huh.FieldStyles {
 	return huh.FieldStyles{
-		Base:                f.Base.Copy(),
-		Title:               f.Title.Copy(),
-		Description:         f.Description.Copy(),
-		ErrorIndicator:      f.ErrorIndicator.Copy(),
-		ErrorMessage:        f.ErrorMessage.Copy(),
-		SelectSelector:      f.SelectSelector.Copy(),
-		Option:              f.Option.Copy(),
-		MultiSelectSelector: f.MultiSelectSelector.Copy(),
-		SelectedOption:      f.SelectedOption.Copy(),
-		SelectedPrefix:      f.SelectedPrefix.Copy(),
-		UnselectedOption:    f.UnselectedOption.Copy(),
-		UnselectedPrefix:    f.UnselectedPrefix.Copy(),
-		FocusedButton:       f.FocusedButton.Copy(),
-		BlurredButton:       f.BlurredButton.Copy(),
+		Base:                f.Base,
+		Title:               f.Title,
+		Description:         f.Description,
+		ErrorIndicator:      f.ErrorIndicator,
+		ErrorMessage:        f.ErrorMessage,
+		SelectSelector:      f.SelectSelector,
+		Option:              f.Option,
+		MultiSelectSelector: f.MultiSelectSelector,
+		SelectedOption:      f.SelectedOption,
+		SelectedPrefix:      f.SelectedPrefix,
+		UnselectedOption:    f.UnselectedOption,
+		UnselectedPrefix:    f.UnselectedPrefix,
+		FocusedButton:       f.FocusedButton,
+		BlurredButton:       f.BlurredButton,
 		TextInput:           copyTextInputStyles(f.TextInput),
-		Card:                f.Card.Copy(),
-		NoteTitle:           f.NoteTitle.Copy(),
-		Next:                f.Next.Copy(),
+		Card:                f.Card,
+		NoteTitle:           f.NoteTitle,
+		Next:                f.Next,
 	}
 }
 
 func copyTextInputStyles(t huh.TextInputStyles) huh.TextInputStyles {
 	return huh.TextInputStyles{
-		Cursor:      t.Cursor.Copy(),
-		Placeholder: t.Placeholder.Copy(),
-		Prompt:      t.Prompt.Copy(),
-		Text:        t.Text.Copy(),
+		Cursor:      t.Cursor,
+		Placeholder: t.Placeholder,
+		Prompt:      t.Prompt,
+		Text:        t.Text,
 	}
 }

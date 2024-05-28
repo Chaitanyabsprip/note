@@ -4,7 +4,7 @@ package config
 import (
 	"testing"
 
-	"github.com/chaitanyabsprip/note/pkg/note"
+	"github.com/chaitanyabsprip/note/internal/note"
 )
 
 func TestConfig_NoteType(t *testing.T) {
@@ -16,33 +16,28 @@ func TestConfig_NoteType(t *testing.T) {
 		{
 			name:     "Bookmark NoteType",
 			expected: note.Bookmark,
-			config:   Config{IsBookmark: true},
+			config:   Config{NoteType: note.Bookmark},
 		},
 		{
 			name:     "Dump NoteType",
 			expected: note.Dump,
-			config:   Config{IsDump: true},
+			config:   Config{NoteType: note.Dump},
 		},
 		{
 			name:     "Todo NoteType",
 			expected: note.Todo,
-			config:   Config{IsTodo: true},
+			config:   Config{NoteType: note.Todo},
 		},
 		{
 			name:     "Issue NoteType",
 			expected: note.Issue,
-			config:   Config{IsIssue: true},
-		},
-		{
-			name:     "Default NoteType",
-			expected: "dump",
-			config:   Config{},
+			config:   Config{NoteType: note.Issue},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := tt.config
-			if got := c.NoteType(); got != tt.expected {
+			if got := c.NoteType; got != tt.expected {
 				t.Errorf("Config.NoteType() = %v, want %v", got, tt.expected)
 			}
 		})
@@ -68,10 +63,7 @@ func TestConfig_Equals(t *testing.T) {
 				Level:         2,
 				NumOfHeadings: 3,
 				EditFile:      true,
-				IsBookmark:    true,
-				IsDump:        false,
-				IsIssue:       false,
-				IsTodo:        false,
+				NoteType:      note.Bookmark,
 				Quiet:         false,
 			},
 			other: Config{
@@ -84,10 +76,7 @@ func TestConfig_Equals(t *testing.T) {
 				Level:         2,
 				NumOfHeadings: 3,
 				EditFile:      true,
-				IsBookmark:    true,
-				IsDump:        false,
-				IsIssue:       false,
-				IsTodo:        false,
+				NoteType:      note.Bookmark,
 				Quiet:         false,
 			},
 			expected: true,

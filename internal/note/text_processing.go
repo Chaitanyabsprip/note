@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chaitanyabsprip/note/pkg/preview"
+	"github.com/chaitanyabsprip/note/internal/preview"
 	"github.com/muesli/reflow/wordwrap"
 )
 

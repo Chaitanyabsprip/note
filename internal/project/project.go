@@ -19,16 +19,22 @@ type Project struct {
 	ID   int    `json:"id"`
 }
 
-// Repository struct  
-type Repository struct {
+// Repository interface  
+type Repository interface {
+	GetProject(name string) *Project
+	AddProject(name, path, url string) (*Project, error)
+	UpdateProject(id int, name, path, url string) (*Project, error)
+}
+
+type repositoryImpl struct {
 	configPath string
 	projects   []*Project
 	mu         sync.Mutex
 }
 
 // NewProjectRepository function  
-func NewProjectRepository(configPath string) (*Repository, error) {
-	pr := &Repository{configPath: configPath}
+func NewProjectRepository(configPath string) (Repository, error) {
+	pr := &repositoryImpl{configPath: configPath}
 	err := pr.loadProjects()
 	if err != nil {
 		return nil, err
@@ -37,7 +43,7 @@ func NewProjectRepository(configPath string) (*Repository, error) {
 }
 
 // GetProject method  
-func (pr *Repository) GetProject(name string) *Project {
+func (pr *repositoryImpl) GetProject(name string) *Project {
 	for _, project := range pr.projects {
 		if project.Name == name {
 			return project
@@ -47,7 +53,7 @@ func (pr *Repository) GetProject(name string) *Project {
 }
 
 // AddProject method  
-func (pr *Repository) AddProject(
+func (pr *repositoryImpl) AddProject(
 	name, path, url string,
 ) (*Project, error) {
 	pr.mu.Lock()
@@ -79,7 +85,7 @@ func (pr *Repository) AddProject(
 }
 
 // UpdateProject method  
-func (pr *Repository) UpdateProject(
+func (pr *repositoryImpl) UpdateProject(
 	id int,
 	name, path, url string,
 ) (*Project, error) {
@@ -113,7 +119,7 @@ func GetRepositoryRoot(dirpath string) string {
 	return strings.ReplaceAll(out.String(), "\n", "")
 }
 
-func (pr *Repository) loadProjects() error {
+func (pr *repositoryImpl) loadProjects() error {
 	if _, err := os.Stat(pr.configPath); os.IsNotExist(err) {
 		err = os.WriteFile(pr.configPath, []byte("[]"), 0o644)
 		if err != nil {
@@ -133,7 +139,7 @@ func (pr *Repository) loadProjects() error {
 	return nil
 }
 
-func (pr *Repository) saveProjects() error {
+func (pr *repositoryImpl) saveProjects() error {
 	data, err := json.MarshalIndent(pr.projects, "", "  ")
 	if err != nil {
 		return err

@@ -10,7 +10,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/chaitanyabsprip/note/pkg/preview"
+	"github.com/chaitanyabsprip/note/internal/preview"
 )
 
 // Note struct  

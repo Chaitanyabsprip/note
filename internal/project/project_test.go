@@ -14,17 +14,36 @@ func TestAddProject(t *testing.T) {
 		t.Fatalf("Error creating project manager: %v", err)
 	}
 
-	_, err = pm.AddProject(
-		"Test Project",
-		"/path/to/project",
-		"http://example.com",
+	projectName := "Test Project"
+	projectPath := "/path/to/project"
+	projectURL := "http://example.com"
+
+	project, err := pm.AddProject(
+		projectName,
+		projectPath,
+		projectURL,
 	)
 	if err != nil {
 		t.Fatalf("Error adding project: %v", err)
 	}
 
-	if len(pm.projects) != 1 {
-		t.Errorf("Expected 1 project, got %d", len(pm.projects))
+	if project.Name != projectName {
+		t.Errorf("Expected project name %s, got %s", projectName, project.Name)
+	}
+	if project.Path != projectPath {
+		t.Errorf("Expected project path %s, got %s", projectPath, project.Path)
+	}
+	if project.URL != projectURL {
+		t.Errorf("Expected project URL %s, got %s", projectURL, project.URL)
+	}
+
+	// Try to add a project with the same name
+	_, err = pm.AddProject(projectName, projectPath, projectURL)
+	if err == nil {
+		t.Error("Expected error when adding a project with the same name, got nil")
+	}
+	if !AlreadyExists(err) {
+		t.Errorf("Expected AlreadyExists error, got %v", err)
 	}
 }
 

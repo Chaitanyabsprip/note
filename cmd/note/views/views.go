@@ -11,11 +11,12 @@ import (
 	"github.com/charmbracelet/huh"
 
 	"github.com/chaitanyabsprip/note/cmd/note/config"
+	"github.com/chaitanyabsprip/note/internal/note"
 )
 
 // GetIssueConfiguration function  
 func GetIssueConfiguration() (*config.Config, error) {
-	c := &config.Config{IsIssue: true}
+	c := &config.Config{NoteType: note.Issue}
 	tags := ""
 	err := huh.NewForm(
 		huh.NewGroup(
@@ -49,7 +50,7 @@ func GetIssueConfiguration() (*config.Config, error) {
 
 // GetBookmarkConfiguration function  
 func GetBookmarkConfiguration() (*config.Config, error) {
-	c := &config.Config{IsBookmark: true}
+	c := &config.Config{NoteType: note.Bookmark}
 	tags := ""
 	err := huh.NewForm(
 		huh.NewGroup(
