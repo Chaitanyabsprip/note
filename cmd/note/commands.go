@@ -276,14 +276,15 @@ note todo --edit "Finish writing documentation"`,
 }
 
 func (cp *CommandTree) determinFilepath(c *config.Config) error {
+	if c.Notespath != "" {
+		return nil
+	}
 	defaultFilename := fmt.Sprint("notes.", c.NoteType, ".md")
 	defaultFilepath, err := cp.getDefaultFilepath(defaultFilename)
 	if err != nil {
 		log.Fatal("Could not determine working directory.")
 	}
-	if c.Notespath == "" {
-		c.Notespath = defaultFilepath
-	}
+	c.Notespath = defaultFilepath
 	if repoRoot := project.GetRepositoryRoot(filepath.Dir(c.Notespath)); repoRoot != "" {
 		c.Notespath = filepath.Join(repoRoot, defaultFilename)
 	}
