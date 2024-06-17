@@ -99,11 +99,6 @@ var (
 				config.Config{NoteType: note.Dump, Notespath: tAltNotespath, Quiet: true},
 			),
 		},
-		// {
-		// 	" kjlag",
-		// 	[]string{"-p", "library"},
-		// 	withDefaults(config.Config{}),
-		// },
 		{
 			"with dump subcommand, Notespath should be <pwd>/notes.dump.md, IsDump should be true",
 			[]string{"dump"},

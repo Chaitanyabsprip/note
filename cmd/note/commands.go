@@ -45,7 +45,7 @@ func (cp *CommandTree) SetupCLI() (*config.Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	cp.determinFilepath(c)
+	cp.determineFilepath(c)
 	return c, nil
 }
 
@@ -275,7 +275,7 @@ note todo --edit "Finish writing documentation"`,
 	return &cmd
 }
 
-func (cp *CommandTree) determinFilepath(c *config.Config) error {
+func (cp *CommandTree) determineFilepath(c *config.Config) error {
 	if c.Notespath != "" {
 		return nil
 	}
