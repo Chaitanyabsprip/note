@@ -15,7 +15,7 @@ import (
 )
 
 // GetIssueConfiguration function  
-func GetIssueConfiguration() (*config.Config, error) {
+func GetIssueConfiguration() (config.Config, error) {
 	c := &config.Config{NoteType: note.Issue}
 	tags := ""
 	err := huh.NewForm(
@@ -45,11 +45,11 @@ func GetIssueConfiguration() (*config.Config, error) {
 		os.Exit(1)
 	}
 	c.Tags = strings.Split(tags, ",")
-	return c, nil
+	return *c, nil
 }
 
 // GetBookmarkConfiguration function  
-func GetBookmarkConfiguration() (*config.Config, error) {
+func GetBookmarkConfiguration() (config.Config, error) {
 	c := &config.Config{NoteType: note.Bookmark}
 	tags := ""
 	err := huh.NewForm(
@@ -84,5 +84,5 @@ func GetBookmarkConfiguration() (*config.Config, error) {
 		os.Exit(1)
 	}
 	c.Tags = strings.Split(tags, ",")
-	return c, nil
+	return *c, nil
 }

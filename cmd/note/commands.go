@@ -128,10 +128,8 @@ func createBookmarkCmd(c *config.Config) *cobra.Command {
 			c.NoteType = note.Bookmark
 			if cmd.Flags().NFlag() == 0 && len(args) == 0 {
 				var err error
-				c, err = views.GetBookmarkConfiguration()
-				if err != nil {
-					return err
-				}
+				*c, err = views.GetBookmarkConfiguration()
+				return err
 			}
 			c.Content = strings.Join(args, " ")
 			return nil
@@ -184,10 +182,8 @@ note issue --tags "bug, urgent" --title "Critical bug" "This is a critical issue
 			c.NoteType = note.Issue
 			if cmd.Flags().NFlag() == 0 && len(args) == 0 {
 				var err error
-				c, err = views.GetIssueConfiguration()
-				if err != nil {
-					return err
-				}
+				*c, err = views.GetIssueConfiguration()
+				return err
 			}
 			c.Content = strings.Join(args, " ")
 			return nil
