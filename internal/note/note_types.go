@@ -52,7 +52,7 @@ func (b bookmark) toMarkdown(content string) (string, error) {
 		tagsLine = fmt.Sprintf("tags: %s  \n", strings.Join(tags, " "))
 	}
 	return fmt.Sprintf(
-		"\n[%s](%s)\\\n%s%s",
+		"\n[%s](%s)\\\n%s%s\n",
 		strings.TrimSpace(title),
 		content,
 		tagsLine,
