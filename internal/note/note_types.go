@@ -39,16 +39,20 @@ func (b bookmark) toMarkdown(content string) (string, error) {
 	if title == "" {
 		title = content
 	}
+	title = strings.TrimSpace(title)
+	if len(title)+len(content)+4 > 80 {
+		title = wordWrap(title, wrapWidth)
+	}
 	tags := make([]string, len(b.tags))
 	for i, tag := range b.tags {
 		tags[i] = fmt.Sprint("**#", tag, "**")
 	}
 	tagsLine := "tags:"
 	if len(tags) > 0 {
-		tagsLine = fmt.Sprintf("tags: %s  \n", strings.Join(b.tags, " "))
+		tagsLine = fmt.Sprintf("tags: %s  \n", strings.Join(tags, " "))
 	}
 	return fmt.Sprintf(
-		"\n[%s](%s)  \n%s%s",
+		"\n[%s](%s)\\\n%s%s",
 		strings.TrimSpace(title),
 		content,
 		tagsLine,

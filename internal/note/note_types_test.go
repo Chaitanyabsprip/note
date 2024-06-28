@@ -21,7 +21,7 @@ func TestNoteTypeToMarkdown(t *testing.T) {
 				tags:        []string{"tag1", "tag2"},
 			},
 			content:  "https://example.com",
-			expected: "[Example Domain](https://example.com)  \ntags: **#tag1** **#tag2**  \nBookmark description",
+			expected: "[Example Domain](https://example.com)\\\ntags: **#tag1** **#tag2**  \nBookmark description",
 		},
 		{
 			name:     "NotesCreation",
@@ -51,13 +51,13 @@ func TestNoteTypeToMarkdown(t *testing.T) {
 			name:     "EmptyContent",
 			noteType: new(bookmark),
 			content:  "",
-			expected: "[]()  \ntags:",
+			expected: "[]()\\\ntags:",
 		},
 		{
 			name:     "InvalidURL",
 			noteType: new(bookmark),
 			content:  "invalid-url",
-			expected: "[invalid-url](invalid-url)  \ntags:\n",
+			expected: "[invalid-url](invalid-url)\\\ntags:\n",
 		},
 		{
 			name: "EmptyLabels",
