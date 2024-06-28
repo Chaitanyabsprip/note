@@ -39,10 +39,13 @@ func (b bookmark) toMarkdown(content string) (string, error) {
 	if title == "" {
 		title = content
 	}
-	tags := strings.Join(b.tags, ", ")
+	tags := make([]string, len(b.tags))
+	for i, tag := range b.tags {
+		tags[i] = fmt.Sprint("**#", tag, "**")
+	}
 	tagsLine := "tags:"
-	if tags != "" {
-		tagsLine = fmt.Sprintf("tags: %s  \n", tags)
+	if len(tags) > 0 {
+		tagsLine = fmt.Sprintf("tags: %s  \n", strings.Join(b.tags, " "))
 	}
 	return fmt.Sprintf(
 		"\n[%s](%s)  \n%s%s",

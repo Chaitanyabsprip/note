@@ -21,7 +21,7 @@ func TestNoteTypeToMarkdown(t *testing.T) {
 				tags:        []string{"tag1", "tag2"},
 			},
 			content:  "https://example.com",
-			expected: "[Example Domain](https://example.com)  \ntags: tag1, tag2  \nBookmark description",
+			expected: "[Example Domain](https://example.com)  \ntags: **#tag1** **#tag2**  \nBookmark description",
 		},
 		{
 			name:     "NotesCreation",
