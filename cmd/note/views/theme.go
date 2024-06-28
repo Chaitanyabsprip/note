@@ -1,7 +1,6 @@
 package views
 
 import (
-	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/huh"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -9,7 +8,7 @@ import (
 // ThemeRosepine function  
 func ThemeRosepine() *huh.Theme {
 	var (
-		base = lipgloss.AdaptiveColor{Light: "#fafafa", Dark: "#0f111A"}
+		// base = lipgloss.AdaptiveColor{Light: "#fafafa", Dark: "#0f111A"}
 		// surface = lipgloss.AdaptiveColor{Light: "#fffaf3", Dark: "#1f1d2e"}
 		overlay = lipgloss.AdaptiveColor{Light: "#f2e9e1", Dark: "#26233a"}
 		// muted   = lipgloss.AdaptiveColor{Light: "#9893a5", Dark: "#6e6a86"}
@@ -25,96 +24,48 @@ func ThemeRosepine() *huh.Theme {
 		highlightMed  = lipgloss.AdaptiveColor{Light: "#dfdad9", Dark: "#403d52"}
 		highlightHigh = lipgloss.AdaptiveColor{Light: "#cecacd", Dark: "#524f67"}
 	)
-	t := copyTheme(*huh.ThemeBase())
+	t := *huh.ThemeBase()
 	t.FieldSeparator = lipgloss.NewStyle().SetString("\n")
 	f := &t.Focused
-	f.Base.BorderForeground(highlightMed).BorderStyle(lipgloss.OuterHalfBlockBorder())
-	f.Title.Foreground(iris).Bold(true)
-	f.NoteTitle.Foreground(rose).Bold(true)
-	f.Description.Foreground(subtle)
-	f.ErrorIndicator.Foreground(love)
+	f.Base = f.Base.BorderForeground(highlightMed).
+		BorderStyle(lipgloss.OuterHalfBlockBorder()).
+		Background(lipgloss.NoColor{})
+	f.Title = f.Title.Foreground(iris).Bold(true)
+	f.NoteTitle = f.NoteTitle.Foreground(rose).Bold(true)
+	f.Description = f.Description.Foreground(subtle).Background(lipgloss.NoColor{})
+	f.ErrorIndicator = f.ErrorIndicator.Foreground(love)
 	f.ErrorMessage = f.ErrorMessage.SetString(" ").Foreground(love)
-	f.Option.Foreground(text)
+	f.Option = f.Option.Foreground(text)
 	f.SelectSelector = f.SelectSelector.Foreground(pine).SetString("▍ ")
-	f.Option.Foreground(text)
+	f.Option = f.Option.Foreground(text)
 	f.MultiSelectSelector = f.MultiSelectSelector.Foreground(pine).SetString("▍ ")
 	f.SelectedPrefix = f.SelectedPrefix.Foreground(foam).SetString(" ")
-	f.SelectedOption.Foreground(foam)
+	f.SelectedOption = f.SelectedOption.Foreground(foam)
 	f.UnselectedPrefix = f.UnselectedPrefix.Foreground(highlightMed).SetString(" ")
-	f.UnselectedOption.Foreground(text)
-	f.FocusedButton.Foreground(text).Background(pine)
-	f.BlurredButton.Foreground(text).Background(highlightLow)
+	f.UnselectedOption = f.UnselectedOption.Foreground(text)
+	f.FocusedButton = f.FocusedButton.Foreground(text).Background(pine)
+	f.BlurredButton = f.BlurredButton.Foreground(text).Background(highlightLow)
 	f.Next = f.FocusedButton
 
 	f.TextInput.Text = f.TextInput.Text.BorderBottom(true).
 		BorderForeground(highlightLow).
-		Background(base)
-	f.TextInput.Cursor.Foreground(highlightHigh)
-	f.TextInput.Placeholder.Foreground(highlightLow)
-	f.TextInput.Prompt.Foreground(highlightMed)
+		Background(lipgloss.NoColor{})
+	f.TextInput.Cursor = f.TextInput.Cursor.Foreground(highlightHigh)
+	f.TextInput.Placeholder = f.TextInput.Placeholder.Foreground(highlightLow).
+		Background(lipgloss.NoColor{})
+	f.TextInput.Prompt = f.TextInput.Prompt.Foreground(highlightMed)
 
-	t.Blurred = copyFieldStyle(*f)
-	t.Blurred.Base.BorderStyle(lipgloss.HiddenBorder()).
+	t.Blurred = *f
+	t.Blurred.Base = t.Blurred.Base.BorderStyle(lipgloss.HiddenBorder()).
 		Background(lipgloss.NoColor{})
 	t.Blurred.MultiSelectSelector = t.Blurred.MultiSelectSelector.SetString("  ")
-	t.Help.Ellipsis.Foreground(overlay)
-	t.Help.ShortKey.Foreground(highlightHigh)
-	t.Help.ShortDesc.Foreground(highlightMed)
-	t.Help.ShortSeparator.Foreground(overlay)
-	t.Help.FullKey.Foreground(highlightHigh)
-	t.Help.FullDesc.Foreground(highlightMed)
-	t.Help.FullSeparator.Foreground(overlay)
+	t.Help.Ellipsis = t.Help.Ellipsis.Foreground(overlay)
+	t.Help.ShortKey = t.Help.ShortKey.Foreground(highlightHigh)
+	t.Help.ShortDesc = t.Help.ShortDesc.Foreground(highlightMed)
+	t.Help.ShortSeparator = t.Help.ShortSeparator.Foreground(overlay)
+	t.Help.FullKey = t.Help.FullKey.Foreground(highlightHigh)
+	t.Help.FullDesc = t.Help.FullDesc.Foreground(highlightMed)
+	t.Help.FullSeparator = t.Help.FullSeparator.Foreground(overlay)
 
 	return &t
-}
-
-func copyTheme(t huh.Theme) huh.Theme {
-	return huh.Theme{
-		Form:           t.Form,
-		Group:          t.Group,
-		FieldSeparator: t.FieldSeparator,
-		Blurred:        copyFieldStyle(t.Blurred),
-		Focused:        copyFieldStyle(t.Focused),
-		Help: help.Styles{
-			Ellipsis:       t.Help.Ellipsis,
-			ShortKey:       t.Help.ShortKey,
-			ShortDesc:      t.Help.ShortDesc,
-			ShortSeparator: t.Help.ShortSeparator,
-			FullKey:        t.Help.FullKey,
-			FullDesc:       t.Help.FullDesc,
-			FullSeparator:  t.Help.FullSeparator,
-		},
-	}
-}
-
-func copyFieldStyle(f huh.FieldStyles) huh.FieldStyles {
-	return huh.FieldStyles{
-		Base:                f.Base,
-		Title:               f.Title,
-		Description:         f.Description,
-		ErrorIndicator:      f.ErrorIndicator,
-		ErrorMessage:        f.ErrorMessage,
-		SelectSelector:      f.SelectSelector,
-		Option:              f.Option,
-		MultiSelectSelector: f.MultiSelectSelector,
-		SelectedOption:      f.SelectedOption,
-		SelectedPrefix:      f.SelectedPrefix,
-		UnselectedOption:    f.UnselectedOption,
-		UnselectedPrefix:    f.UnselectedPrefix,
-		FocusedButton:       f.FocusedButton,
-		BlurredButton:       f.BlurredButton,
-		TextInput:           copyTextInputStyles(f.TextInput),
-		Card:                f.Card,
-		NoteTitle:           f.NoteTitle,
-		Next:                f.Next,
-	}
-}
-
-func copyTextInputStyles(t huh.TextInputStyles) huh.TextInputStyles {
-	return huh.TextInputStyles{
-		Cursor:      t.Cursor,
-		Placeholder: t.Placeholder,
-		Prompt:      t.Prompt,
-		Text:        t.Text,
-	}
 }
