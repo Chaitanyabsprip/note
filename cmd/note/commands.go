@@ -18,7 +18,7 @@ import (
 	"github.com/chaitanyabsprip/note/internal/project"
 )
 
-const version = "v0.1.0"
+const version = "v0.1.1"
 
 // CommandTree struct  
 type CommandTree struct {
