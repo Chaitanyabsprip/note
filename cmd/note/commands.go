@@ -144,7 +144,6 @@ func createBookmarkCmd(c *config.Config) *cobra.Command {
 				*c, err = views.GetBookmarkConfiguration()
 				return err
 			}
-			fmt.Println(len(args), args)
 			if len(args) > 0 {
 				c.Content = args[0]
 			}
